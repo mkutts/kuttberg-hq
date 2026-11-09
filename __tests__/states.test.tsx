@@ -5,14 +5,15 @@ import { EmptyState, ErrorState, LoadingState } from '../src/components/states';
 test('shows the default loading message and exposes busy progress', async () => {
   await render(<LoadingState />);
 
-  expect(screen.getByText('Loading…')).toBeOnTheScreen();
+  expect(screen.getByText('Loading…', { includeHiddenElements: true })).toBeOnTheScreen();
+  expect(screen.queryByText('Loading…')).toBeNull();
   expect(screen.getByRole('progressbar', { name: 'Loading…', busy: true })).toBeOnTheScreen();
 });
 
 test('uses the custom loading message for visible text and the accessible label', async () => {
   await render(<LoadingState message="Preparing your overview…" />);
 
-  expect(screen.getByText('Preparing your overview…')).toBeOnTheScreen();
+  expect(screen.getByText('Preparing your overview…', { includeHiddenElements: true })).toBeOnTheScreen();
   expect(screen.getByRole('progressbar', { name: 'Preparing your overview…', busy: true })).toBeOnTheScreen();
 });
 

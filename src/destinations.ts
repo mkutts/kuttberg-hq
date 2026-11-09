@@ -2,8 +2,6 @@ export const destinations = {
   index: {
     title: 'Today',
     icon: 'home',
-    description: 'Your day, at a glance.',
-    future: 'Your daily priorities and household updates will appear here in a future milestone.',
   },
   routines: {
     title: 'Routines',

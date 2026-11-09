@@ -1,7 +1,7 @@
 import Feather from '@expo/vector-icons/Feather';
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { AppState, Pressable, StyleSheet, View } from 'react-native';
 
 import { AppCard } from '../../src/components/ui/AppCard';
 import { AppScreen } from '../../src/components/ui/AppScreen';
@@ -29,7 +29,13 @@ export default function TodayScreen() {
   const [now, setNow] = useState(() => new Date());
 
   useFocusEffect(useCallback(() => {
-    setNow(new Date());
+    const refresh = () => setNow(new Date());
+    refresh();
+
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state === 'active') refresh();
+    });
+    return () => subscription.remove();
   }, []));
 
   return (
@@ -50,7 +56,13 @@ export default function TodayScreen() {
           onPress={() => router.navigate('/settings')}
           style={({ pressed }) => [styles.settings, pressed && styles.settingsPressed]}
         >
-          <Feather name="settings" size={22} color={colors.primary} accessible={false} />
+          <Feather
+            name="settings"
+            size={22}
+            color={colors.primary}
+            accessibilityElementsHidden
+            importantForAccessibility="no"
+          />
         </Pressable>
       </View>
 

@@ -1,5 +1,5 @@
-import { fireEvent, renderRouter, screen } from 'expo-router/testing-library';
-import { Platform } from 'react-native';
+import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library';
+import { AppState, Platform } from 'react-native';
 
 const tabRole = Platform.OS === 'ios' ? 'button' : 'tab';
 const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: 'full' });
@@ -38,6 +38,21 @@ test('refreshes the greeting and date when returning to Today', async () => {
   await fireEvent.press(screen.getByRole(tabRole, { name: 'Today' }));
 
   expect(screen).toHavePathname('/');
+  expect(screen.getByRole('header', { name: 'Good morning' })).toBeOnTheScreen();
+  expect(screen.getByText(dateFormat.format(nextDay))).toBeOnTheScreen();
+});
+
+test('refreshes the greeting and date when the app resumes on Today', async () => {
+  const appStateEvents = jest.mocked(AppState.addEventListener).mockClear();
+  jest.setSystemTime(new Date(2026, 10, 9, 23, 55));
+  await renderRouter('app');
+  expect(screen.getByRole('header', { name: 'Good evening' })).toBeOnTheScreen();
+
+  const onChange = appStateEvents.mock.calls.find(([event]) => event === 'change')?.[1];
+  const nextDay = new Date(2026, 10, 10, 0, 5);
+  jest.setSystemTime(nextDay);
+  await act(() => onChange?.('active'));
+
   expect(screen.getByRole('header', { name: 'Good morning' })).toBeOnTheScreen();
   expect(screen.getByText(dateFormat.format(nextDay))).toBeOnTheScreen();
 });

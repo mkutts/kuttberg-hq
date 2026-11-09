@@ -21,7 +21,13 @@ export function LoadingState({ message = 'Loading…' }: LoadingStateProps) {
         color={colors.primary}
         style={styles.indicator}
       />
-      <AppText variant="secondaryBody">{message}</AppText>
+      <AppText
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+        variant="secondaryBody"
+      >
+        {message}
+      </AppText>
     </View>
   );
 }

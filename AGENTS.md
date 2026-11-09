@@ -12,9 +12,9 @@
 Before each coding task, verify that the working directory and Git root are
 `C:\Users\mattk\Kutberg HQ`, the active branch is `milestone/01-app-foundation`,
 and `origin` points to `https://github.com/mkutts/kuttberg-hq.git`. Confirm the
-branch tracks `origin/milestone/01-app-foundation`. Fetch and check for upstream
-changes before editing. Stop if any location or Git check fails, if the branch
-is behind or unexpectedly diverged, or if the working tree has unexpected changes.
+branch tracks `origin/milestone/01-app-foundation`. Read this file, fetch `origin`,
+and verify that the local and upstream milestone branches point to the same
+commit and that the working tree is clean before editing. Stop if any check fails.
 
 Keep project changes inside the approved repository and leave the old OneDrive
 project directory untouched. Scope commits and pushes to the approved task and
@@ -22,10 +22,11 @@ milestone branch. Commits and merges to `main` require explicit authorization.
 Never force-push or rewrite history. Verify the push and confirm the working
 tree is clean.
 
-Validate both iOS and Android. Run the shared quality checks and export bundles
-for both platforms. Report automated checks, Android emulator and physical-device
-checks, and iOS Simulator and iPhone checks separately. List checks that failed
-or were skipped and explain the verification limits.
+Validate both iOS and Android. Run lint, strict TypeScript, Jest, the Android and
+iOS Jest presets when supported, Expo dependency validation, Expo Doctor, and
+bundle exports for both platforms. Report automated checks, Android emulator,
+Android physical device, iOS Simulator, and iPhone separately. Record failures,
+skipped checks, and verification limits in `docs/milestone-01-verification.md`.
 
 1. **Repository Inspection and App Foundation Setup.** Inspect the repository and establish Expo, React Native, TypeScript, Expo Router, basic testing, and documentation.
 2. **Design System.** Create reusable colors, typography, spacing, UI components, and accessibility foundations.

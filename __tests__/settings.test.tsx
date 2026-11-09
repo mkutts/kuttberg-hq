@@ -23,6 +23,14 @@ test('a navigation back action from Settings restores Today', async () => {
   expect(screen.getByRole('button', { name: 'Settings' })).toBeOnTheScreen();
 });
 
+test('the visible back control returns to Today when Settings is opened directly', async () => {
+  await renderRouter('app', { initialUrl: '/settings' });
+  await fireEvent.press(screen.getByRole('button', { name: 'Back to Today' }));
+
+  expect(screen).toHavePathname('/');
+  expect(screen.getByRole('header', { name: 'Your daily overview' })).toBeOnTheScreen();
+});
+
 test('shows configured app information and keeps future preferences informational', async () => {
   await renderRouter('app', { initialUrl: '/settings' });
 

@@ -19,6 +19,8 @@ coverage/
 !.env.example
 .npmrc
 credentials.json
+google-services.json
+GoogleService-Info.plist
 *.jks
 *.keystore
 *.p8
