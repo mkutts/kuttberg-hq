@@ -8,25 +8,25 @@ export const destinations = {
   routines: {
     title: 'Routines',
     icon: 'repeat',
-    description: 'Keep the everyday things running smoothly.',
-    future: 'Recurring routines and daily care checklists are coming soon.',
+    description: 'Keep everyday life running smoothly.',
+    future: 'Daily routines, care schedules, and household checklists are planned.',
   },
   wellness: {
     title: 'Wellness',
     icon: 'heart',
     description: 'Make space for feeling your best.',
-    future: 'Wellness tracking and personal goals are coming in a future milestone.',
+    future: 'Personal goals, healthy habits, and medication and vitamin tracking are planned.',
   },
   responsibilities: {
     title: 'Responsibilities',
     icon: 'clipboard',
-    description: 'Stay on top of what matters.',
-    future: 'Household, property, and shared responsibilities are coming soon.',
+    description: 'Keep household and property responsibilities organized.',
+    future: 'Household responsibilities, property maintenance, and delegated follow-ups are planned.',
   },
   inbox: {
     title: 'Inbox',
     icon: 'inbox',
-    description: "One place to capture what's on your mind.",
-    future: 'Quick capture and items awaiting organization are coming soon.',
+    description: 'Capture now. Organize later.',
+    future: 'Quick task capture, ideas and reminders, and items awaiting organization are planned.',
   },
 } as const;

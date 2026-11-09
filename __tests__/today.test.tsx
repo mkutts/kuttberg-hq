@@ -58,6 +58,7 @@ test('describes every dashboard section as future functionality', async () => {
     expect(screen.getByRole('header', { name: title })).toBeOnTheScreen();
     expect(screen.getByText(description)).toBeOnTheScreen();
   }
-  expect(screen.getAllByRole(tabRole)).toHaveLength(5);
-  expect(screen.queryAllByRole('button')).toHaveLength(Platform.OS === 'ios' ? 5 : 0);
+  expect(screen.getAllByRole(tabRole)).toHaveLength(Platform.OS === 'ios' ? 6 : 5);
+  expect(screen.getByRole('button', { name: 'Settings' })).toBeOnTheScreen();
+  expect(screen.queryAllByRole('button')).toHaveLength(Platform.OS === 'ios' ? 6 : 1);
 });

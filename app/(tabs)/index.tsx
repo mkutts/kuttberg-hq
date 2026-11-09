@@ -1,12 +1,13 @@
-import { useFocusEffect } from 'expo-router';
+import Feather from '@expo/vector-icons/Feather';
+import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 
 import { AppCard } from '../../src/components/ui/AppCard';
 import { AppScreen } from '../../src/components/ui/AppScreen';
 import { AppText } from '../../src/components/ui/AppText';
 import { SectionHeader } from '../../src/components/ui/SectionHeader';
-import { colors, spacing } from '../../src/theme';
+import { colors, radii, spacing } from '../../src/theme';
 
 const upcomingSections = [
   { title: 'Up Next', description: 'Upcoming events and important dates will appear here.' },
@@ -33,14 +34,24 @@ export default function TodayScreen() {
 
   return (
     <AppScreen scroll edges={['top', 'left', 'right']} contentStyle={styles.content}>
-      <View style={styles.welcome}>
-        <AppText variant="caption" style={styles.eyebrow}>
-          {now.toLocaleDateString(undefined, { dateStyle: 'full' })}
-        </AppText>
-        <AppText variant="screenTitle" accessibilityRole="header">
-          {getGreeting(now.getHours())}
-        </AppText>
-        <AppText variant="secondaryBody">Your day, at a glance.</AppText>
+      <View style={styles.header}>
+        <View style={styles.welcome}>
+          <AppText variant="caption" style={styles.eyebrow}>
+            {now.toLocaleDateString(undefined, { dateStyle: 'full' })}
+          </AppText>
+          <AppText variant="screenTitle" accessibilityRole="header">
+            {getGreeting(now.getHours())}
+          </AppText>
+          <AppText variant="secondaryBody">Your day, at a glance.</AppText>
+        </View>
+        <Pressable
+          accessibilityLabel="Settings"
+          accessibilityRole="button"
+          onPress={() => router.navigate('/settings')}
+          style={({ pressed }) => [styles.settings, pressed && styles.settingsPressed]}
+        >
+          <Feather name="settings" size={22} color={colors.primary} accessible={false} />
+        </Pressable>
       </View>
 
       <AppCard style={styles.overview}>
@@ -64,7 +75,19 @@ export default function TodayScreen() {
 
 const styles = StyleSheet.create({
   content: { width: '100%', maxWidth: 600, alignSelf: 'center', gap: spacing.xl },
-  welcome: { gap: spacing.xs },
+  header: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
+  welcome: { flex: 1, gap: spacing.xs },
+  settings: {
+    width: 48,
+    height: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.card,
+    borderWidth: 1,
+    borderColor: colors.primary,
+    borderRadius: radii.button,
+  },
+  settingsPressed: { backgroundColor: colors.secondaryPressed },
   eyebrow: { color: colors.primary, fontWeight: '600' },
   overview: {
     backgroundColor: colors.secondaryPressed,

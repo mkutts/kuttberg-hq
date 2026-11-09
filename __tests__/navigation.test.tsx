@@ -2,23 +2,26 @@ import { fireEvent, renderRouter, screen, testRouter } from 'expo-router/testing
 import { Platform } from 'react-native';
 
 const destinations = [
-  ['Today', '/'],
-  ['Routines', '/routines'],
-  ['Wellness', '/wellness'],
-  ['Responsibilities', '/responsibilities'],
-  ['Inbox', '/inbox'],
+  ['Today', '/', 'Your day, at a glance.'],
+  ['Routines', '/routines', 'Keep everyday life running smoothly.'],
+  ['Wellness', '/wellness', 'Make space for feeling your best.'],
+  ['Responsibilities', '/responsibilities', 'Keep household and property responsibilities organized.'],
+  ['Inbox', '/inbox', 'Capture now. Organize later.'],
 ] as const;
 const tabRole = Platform.OS === 'ios' ? 'button' : 'tab';
 
 test('opens Today and switches between all five named tabs', async () => {
   await renderRouter('app');
   expect(screen).toHavePathname('/');
-  expect(screen.getAllByRole(tabRole)).toHaveLength(5);
+  expect(screen.getAllByRole(tabRole).filter((control) =>
+    control.props.accessibilityState?.selected !== undefined,
+  )).toHaveLength(5);
   expect(screen.getByRole(tabRole, { name: 'Today', selected: true })).toBeOnTheScreen();
 
-  for (const [title, pathname] of [...destinations.slice(1), destinations[0]]) {
+  for (const [title, pathname, description] of [...destinations.slice(1), destinations[0]]) {
     await fireEvent.press(screen.getByRole(tabRole, { name: title, selected: false }));
     expect(screen).toHavePathname(pathname);
+    expect(screen.getByText(description)).toBeOnTheScreen();
     if (pathname === '/') {
       expect(screen.getByRole('header', { name: 'Your daily overview' })).toBeOnTheScreen();
     } else {

@@ -26,6 +26,8 @@ Run `npm start` on your computer and open the project in Expo Go on each phone u
 
 Repeat with larger system text and system dark mode. With VoiceOver or TalkBack, check that each tab announces its full name and selected state. The Responsibilities label can wrap across two lines on smaller screens or at larger text sizes. Tab labels scale up to 160% and fit to the available width. Screen content follows the system text size.
 
+On each phone, tap the gear at the top of Today. Check that **Settings** shows the app name, version, and privacy information, and that each future preference says **Coming later**. The tab bar is hidden on Settings. Tap **Back to Today** and confirm all five tabs are visible again. On Android, reopen Settings and repeat with the system Back button or gesture. Open Routines, Wellness, Responsibilities, and Inbox and check each tab's purpose and **Coming soon** card. Repeat the Settings flow with larger system text and confirm you can scroll to Privacy.
+
 ## Development checks
 
 ```sh
@@ -37,10 +39,12 @@ npx expo export --platform all
 npx expo-doctor
 ```
 
-Jest and React Native Testing Library cover the five routes, tab selection, back navigation, shared components, and the Today dashboard, including its local greeting and date on return. Task 01 was verified on an iPhone and an Android phone. Tasks 02 and 03 were verified on Android and still need physical iPhone checks.
+Jest and React Native Testing Library cover the five tabs, Settings navigation and content, shared components, and the Today dashboard, including its local greeting and date on return. Task 01 was verified on an iPhone and an Android phone. Tasks 02–04 were verified on Android and still need physical iPhone checks.
 
-## Milestone 01, Task 04 of 8
+## Milestone 01, Task 05 of 8
 
-The five main routes live in `app/(tabs)`. Today has a scrollable dashboard with a welcome header that refreshes when the tab gains focus, a daily overview card, and four sections labeled **Coming later**. The other tabs use the shared placeholder layout. Shared colors, typography, spacing, and radii live in `src/theme`. `AppText`, `AppButton`, `AppCard`, `AppScreen`, and `SectionHeader` live in `src/components/ui`. The original design-system preview remains in `src/dev/DesignSystemPreview.tsx` for development reference.
+The five main routes live in `app/(tabs)`. Today has a scrollable dashboard with a welcome header that refreshes when the tab gains focus, a daily overview card, and four sections labeled **Coming later**. Routines, Wellness, Responsibilities, and Inbox share an informational layout with a distinct icon and a preview of planned features. The gear on Today opens `app/settings.tsx` in the root stack. Settings reads the version from the Expo configuration and displays future preferences as informational text.
+
+Shared colors, typography, spacing, and radii live in `src/theme`. `AppText`, `AppButton`, `AppCard`, `AppScreen`, and `SectionHeader` live in `src/components/ui`. The original design-system preview remains in `src/dev/DesignSystemPreview.tsx` for development reference.
 
 Both platforms use the temporary development identifier `com.example.kuttberghq`. Confirm and replace it before a production release. Expo generates the native project directories locally when needed.
