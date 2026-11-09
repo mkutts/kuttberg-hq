@@ -1,4 +1,4 @@
-import { DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { DefaultTheme, Slot, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 import { colors } from '../src/theme';
@@ -20,7 +20,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={lightTheme}>
       <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }} />
+      <Slot />
     </ThemeProvider>
   );
 }

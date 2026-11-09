@@ -8,19 +8,20 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 
 import { colors, spacing } from '../../theme';
 
 type AppScreenProps = {
   children: ReactNode;
   scroll?: boolean;
+  edges?: Edge[];
   contentStyle?: StyleProp<ViewStyle>;
 };
 
-export function AppScreen({ children, scroll = false, contentStyle }: AppScreenProps) {
+export function AppScreen({ children, scroll = false, edges, contentStyle }: AppScreenProps) {
   return (
-    <SafeAreaView style={styles.screen}>
+    <SafeAreaView style={styles.screen} edges={edges}>
       <KeyboardAvoidingView style={styles.fill} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         {scroll ? (
           <ScrollView

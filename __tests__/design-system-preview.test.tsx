@@ -1,9 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
-import HomeScreen from '../app/index';
+import DesignSystemPreview from '../src/dev/DesignSystemPreview';
 
 test('shows the Kuttberg HQ design system preview', async () => {
-  await render(<HomeScreen />);
+  await render(<DesignSystemPreview />);
 
   expect(screen.getByRole('header', { name: 'Kuttberg HQ' })).toBeOnTheScreen();
   expect(screen.getByText('DESIGN SYSTEM PREVIEW')).toBeOnTheScreen();
@@ -11,7 +11,7 @@ test('shows the Kuttberg HQ design system preview', async () => {
 });
 
 test('activates and resets the local preview', async () => {
-  await render(<HomeScreen />);
+  await render(<DesignSystemPreview />);
 
   await fireEvent.press(screen.getByRole('button', { name: 'Activate demo' }));
   expect(screen.getByText('Demo active.')).toBeOnTheScreen();

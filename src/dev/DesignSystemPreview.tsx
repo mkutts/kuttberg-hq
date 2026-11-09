@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { AppButton } from '../src/components/ui/AppButton';
-import { AppCard } from '../src/components/ui/AppCard';
-import { AppScreen } from '../src/components/ui/AppScreen';
-import { AppText } from '../src/components/ui/AppText';
-import { SectionHeader } from '../src/components/ui/SectionHeader';
-import { colors, palette, radii, spacing } from '../src/theme';
+import { AppButton } from '../components/ui/AppButton';
+import { AppCard } from '../components/ui/AppCard';
+import { AppScreen } from '../components/ui/AppScreen';
+import { AppText } from '../components/ui/AppText';
+import { SectionHeader } from '../components/ui/SectionHeader';
+import { colors, palette, radii, spacing } from '../theme';
 
 const swatches = [
   { name: 'Warm cream', color: palette.cream },
@@ -16,7 +16,7 @@ const swatches = [
   { name: 'Soft gold', color: palette.gold },
 ];
 
-export default function HomeScreen() {
+export default function DesignSystemPreview() {
   const [previewActive, setPreviewActive] = useState(false);
 
   return (
