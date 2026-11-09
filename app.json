@@ -3,18 +3,43 @@
     "name": "Kuttberg HQ",
     "slug": "kuttberg-hq",
     "version": "1.0.0",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "scheme": "kuttberg-hq",
     "plugins": [
-      ["expo-router", { "sitemap": false }],
+      [
+        "expo-router",
+        {
+          "sitemap": false
+        }
+      ],
       "expo-font",
-      ["expo-dev-client", { "toolsButton": false }]
+      [
+        "expo-dev-client",
+        {
+          "toolsButton": false
+        }
+      ]
     ],
     "ios": {
       "bundleIdentifier": "com.example.kuttberghq"
     },
     "android": {
       "package": "com.example.kuttberghq"
-    }
+    },
+    "extra": {
+      "router": {
+        "sitemap": false,
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "32c14ce4-a3e8-4dcd-af19-49cdc676b3bb"
+      }
+    },
+    "owner": "mkutts"
   }
 }
