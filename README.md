@@ -22,7 +22,7 @@ To open the app on a physical phone, install an Expo Go release that supports SD
 
 If compatible Expo Go is unavailable for your target, use `npx expo run:ios` on a Mac with Xcode or `npx expo run:android` with the Android SDK and JDK configured. These commands build and install the app locally. See [Expo's local build setup](https://docs.expo.dev/guides/local-app-development/).
 
-On both platforms, confirm the app opens to **Kuttberg HQ** and displays “Your household command center is taking shape.”
+On both platforms, confirm the app opens to **Kuttberg HQ** and shows **Design System Preview**. Scroll to the five labeled swatches, activate and reset the demo, and confirm the disabled button does not respond. Repeat with larger system text and system dark mode. Check for readable text, safe-area spacing, and dark status bar icons against the light theme. With VoiceOver or TalkBack, check that headings, buttons, and the disabled state are announced.
 
 ## Development checks
 
@@ -31,13 +31,14 @@ npm run lint
 npm run typecheck
 npm test
 npx expo install --check
+npx expo export --platform all
 npx expo-doctor
 ```
 
-The rendering test checks the welcome screen with Jest and React Native Testing Library. Task 01 verified the welcome screen in Expo Go on an Android 16 emulator and exported bundles for both platforms. An iOS launch still needs an iPhone or a Mac with Xcode and the iOS Simulator. The Task 01 environment runs Windows.
+Jest and React Native Testing Library cover the preview, its demo controls, and the shared components. Task 01 was verified on an iPhone and an Android phone. Task 02 requires a separate visual and accessibility pass on both platforms.
 
-## Milestone 01, Task 01 of 8
+## Milestone 01, Task 02 of 8
 
-The current scope is repository inspection and the app foundation. The app has one welcome screen. The design system, five-tab navigation, Today dashboard, reusable UI library, authentication, Supabase, analytics, and household data are outside Task 01.
+The app opens to a temporary design-system preview. Shared colors, typography, spacing, and radii live in `src/theme`. `AppText`, `AppButton`, `AppCard`, `AppScreen`, and `SectionHeader` live in `src/components/ui`. The preview uses a light theme, system fonts, and React Native text scaling. Five-tab navigation and the Today dashboard are scheduled for later tasks.
 
 Both platforms use the temporary development identifier `com.example.kuttberghq`. Confirm and replace it before a production release. Expo generates the native project directories locally when needed.

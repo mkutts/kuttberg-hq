@@ -1,10 +1,21 @@
-import { render, screen } from '@testing-library/react-native';
+import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import HomeScreen from '../app/index';
 
-test('shows the Kuttberg HQ welcome screen', async () => {
+test('shows the Kuttberg HQ design system preview', async () => {
   await render(<HomeScreen />);
 
   expect(screen.getByRole('header', { name: 'Kuttberg HQ' })).toBeOnTheScreen();
-  expect(screen.getByText('Your household command center is taking shape.')).toBeOnTheScreen();
+  expect(screen.getByText('DESIGN SYSTEM PREVIEW')).toBeOnTheScreen();
+  expect(screen.getByText('Sage green')).toBeOnTheScreen();
+});
+
+test('activates and resets the local preview', async () => {
+  await render(<HomeScreen />);
+
+  await fireEvent.press(screen.getByRole('button', { name: 'Activate demo' }));
+  expect(screen.getByText('Demo active.')).toBeOnTheScreen();
+  await fireEvent.press(screen.getByRole('button', { name: 'Reset demo' }));
+  expect(screen.getByText('Demo ready.')).toBeOnTheScreen();
+  expect(screen.getByRole('button', { name: 'Disabled demo' })).toBeDisabled();
 });

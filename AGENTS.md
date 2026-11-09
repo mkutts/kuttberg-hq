@@ -9,6 +9,22 @@
 
 ## Milestone 01 — App Foundation
 
+Before each milestone task, verify that the working directory and Git root are
+`C:\Users\mattk\Kutberg HQ`, the active branch is `milestone/01-app-foundation`,
+and `origin` points to `https://github.com/mkutts/kuttberg-hq.git`. Confirm the
+branch tracks `origin/milestone/01-app-foundation`. Fetch and check for upstream
+changes before editing. Stop if any location or Git check fails, if the branch
+is behind or unexpectedly diverged, or if the working tree has unexpected changes.
+
+Keep the old OneDrive project directory untouched. Scope commits and pushes to
+the approved task and milestone branch. Changes to `main` require explicit
+authorization. Never force-push or rewrite history. Verify the push and confirm
+the working tree is clean.
+
+Validate both iOS and Android. Run the shared quality checks and export bundles
+for both platforms. Use available simulators, emulators, or devices and report
+which platforms were verified at each level.
+
 1. **Repository Inspection and App Foundation Setup.** Inspect the repository and establish Expo, React Native, TypeScript, Expo Router, basic testing, and documentation.
 2. **Design System.** Create reusable colors, typography, spacing, UI components, and accessibility foundations.
 3. **Five-Tab Navigation.** Implement Today, Routines, Wellness, Responsibilities, and Inbox navigation.
@@ -18,4 +34,4 @@
 7. **Quality Checks and Project Documentation.** Finalize linting, TypeScript validation, automated tests, README, and AGENTS.md.
 8. **iPhone and Android Build Verification.** Configure development-build readiness and verify the application on both platforms.
 
-Stop after Task 01 for user review. Begin Task 02 and each subsequent task only after explicit approval.
+Stop after each task for user review. Begin each subsequent task only after explicit approval.

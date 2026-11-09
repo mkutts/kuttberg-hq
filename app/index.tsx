@@ -1,38 +1,87 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+
+import { AppButton } from '../src/components/ui/AppButton';
+import { AppCard } from '../src/components/ui/AppCard';
+import { AppScreen } from '../src/components/ui/AppScreen';
+import { AppText } from '../src/components/ui/AppText';
+import { SectionHeader } from '../src/components/ui/SectionHeader';
+import { colors, palette, radii, spacing } from '../src/theme';
+
+const swatches = [
+  { name: 'Warm cream', color: palette.cream },
+  { name: 'Sage green', color: palette.sage },
+  { name: 'Muted peach', color: palette.peach },
+  { name: 'Soft lavender', color: palette.lavender },
+  { name: 'Soft gold', color: palette.gold },
+];
 
 export default function HomeScreen() {
+  const [previewActive, setPreviewActive] = useState(false);
+
   return (
-    <SafeAreaView style={styles.screen}>
-      <StatusBar style="dark" />
-      <Text accessibilityRole="header" style={styles.title}>
-        Kuttberg HQ
-      </Text>
-      <Text style={styles.message}>
-        Your household command center is taking shape.
-      </Text>
-    </SafeAreaView>
+    <AppScreen scroll contentStyle={styles.screen}>
+      <View style={styles.intro}>
+        <AppText variant="caption" style={styles.eyebrow}>DESIGN SYSTEM PREVIEW</AppText>
+        <AppText variant="screenTitle" accessibilityRole="header">Kuttberg HQ</AppText>
+        <AppText variant="body" style={styles.supportingText}>
+          A warm, readable foundation for the household command center.
+        </AppText>
+      </View>
+
+      <View style={styles.section}>
+        <SectionHeader
+          title="Type & surfaces"
+          description="System type, comfortable spacing, and a quiet card surface."
+        />
+        <AppCard style={styles.sample}>
+          <AppText variant="cardTitle">Sample card</AppText>
+          <AppText>Body text for everyday reading.</AppText>
+          <AppText variant="secondaryBody">Secondary text adds supporting detail.</AppText>
+          <AppText variant="caption">Captions label small details.</AppText>
+        </AppCard>
+      </View>
+
+      <View style={styles.section}>
+        <SectionHeader title="Buttons" description="Try the demo controls to see their states." />
+        <AppButton label="Activate demo" onPress={() => setPreviewActive(true)} />
+        <AppButton label="Reset demo" variant="secondary" onPress={() => setPreviewActive(false)} />
+        <AppButton label="Disabled demo" disabled />
+        <AppText variant="secondaryBody" accessibilityLiveRegion="polite">
+          {previewActive ? 'Demo active.' : 'Demo ready.'}
+        </AppText>
+      </View>
+
+      <View style={styles.section}>
+        <SectionHeader title="Palette" description="Brand colors appear as accents and surfaces." />
+        <AppCard style={styles.swatches}>
+          {swatches.map(({ name, color }) => (
+            <View key={name} style={styles.swatch}>
+              <View style={[styles.colorChip, { backgroundColor: color }]} />
+              <AppText variant="caption">{name}</AppText>
+            </View>
+          ))}
+        </AppCard>
+      </View>
+    </AppScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    justifyContent: 'center',
-    gap: 8,
-    paddingHorizontal: 24,
-    backgroundColor: '#fff',
+  screen: { gap: spacing['3xl'], paddingVertical: spacing['3xl'] },
+  intro: {
+    gap: spacing.sm,
+    backgroundColor: colors.elevated,
+    borderRadius: radii.container,
+    borderTopWidth: spacing.xs,
+    borderTopColor: palette.sage,
+    padding: spacing.xl,
   },
-  title: {
-    color: '#111',
-    fontSize: 28,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  message: {
-    color: '#444',
-    fontSize: 16,
-    textAlign: 'center',
-  },
+  eyebrow: { color: colors.primary, fontWeight: '700', letterSpacing: 1.2 },
+  supportingText: { color: colors.secondaryText },
+  section: { gap: spacing.md },
+  sample: { gap: spacing.xs },
+  swatches: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
+  swatch: { flexGrow: 1, flexBasis: 72, gap: spacing.xs },
+  colorChip: { height: spacing['3xl'], borderRadius: radii.input, borderWidth: 1, borderColor: colors.border },
 });
