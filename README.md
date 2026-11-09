@@ -39,7 +39,7 @@ npx expo export --platform all
 npx expo-doctor
 ```
 
-Jest and React Native Testing Library cover the five tabs, Settings navigation and content, shared components, and the Today dashboard, including its local greeting and date on return. Task 01 was verified on an iPhone and an Android phone. Tasks 02–04 were verified on Android and still need physical iPhone checks.
+Jest and React Native Testing Library cover the five tabs, Settings navigation and content, shared components, and the Today dashboard, including its local greeting and date on return. Task 01 was verified on an iPhone and an Android phone. Tasks 02–05 were verified on a physical Android phone and still need physical iPhone checks.
 
 ## Milestone 01, Task 05 of 8
 
@@ -48,3 +48,9 @@ The five main routes live in `app/(tabs)`. Today has a scrollable dashboard with
 Shared colors, typography, spacing, and radii live in `src/theme`. `AppText`, `AppButton`, `AppCard`, `AppScreen`, and `SectionHeader` live in `src/components/ui`. The original design-system preview remains in `src/dev/DesignSystemPreview.tsx` for development reference.
 
 Both platforms use the temporary development identifier `com.example.kuttberghq`. Confirm and replace it before a production release. Expo generates the native project directories locally when needed.
+
+## Milestone 01, Task 06 of 8
+
+`src/components/states` exports `LoadingState`, `EmptyState`, and `ErrorState` for use inside cards or screen sections. `LoadingState` displays an indeterminate indicator and an optional custom message. `EmptyState` describes an empty result and can show a decorative icon or a caller-supplied action. Keep **Coming soon** for planned features. `ErrorState` accepts a user-facing message and shows **Try again** when the caller provides `onRetry`.
+
+The design-system preview includes all three states and both variants of the optional actions. Its demo buttons update local preview text. Run `npm test -- design-system-preview states` to exercise the fixture and components. The fixture is outside the app routes. Viewing it on a phone requires a separate development-only entry point.

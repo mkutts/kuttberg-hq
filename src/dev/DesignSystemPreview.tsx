@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { EmptyState, ErrorState, LoadingState } from '../components/states';
 import { AppButton } from '../components/ui/AppButton';
 import { AppCard } from '../components/ui/AppCard';
 import { AppScreen } from '../components/ui/AppScreen';
@@ -18,6 +19,7 @@ const swatches = [
 
 export default function DesignSystemPreview() {
   const [previewActive, setPreviewActive] = useState(false);
+  const [stateFeedback, setStateFeedback] = useState('Demo controls ready.');
 
   return (
     <AppScreen scroll contentStyle={styles.screen}>
@@ -50,6 +52,34 @@ export default function DesignSystemPreview() {
         <AppText variant="secondaryBody" accessibilityLiveRegion="polite">
           {previewActive ? 'Demo active.' : 'Demo ready.'}
         </AppText>
+      </View>
+
+      <View style={styles.section}>
+        <SectionHeader title="Interface states" description="Demo controls only update the preview message." />
+        <AppCard><LoadingState /></AppCard>
+        <AppCard>
+          <EmptyState
+            title="Nothing here yet"
+            description="Items appear here when you add them."
+            icon="inbox"
+          />
+        </AppCard>
+        <AppCard>
+          <EmptyState
+            title="No examples selected"
+            action={{ label: 'Try demo action', onPress: () => setStateFeedback('Demo action tapped.') }}
+          />
+        </AppCard>
+        <AppCard>
+          <ErrorState
+            message="The preview shows what an error with a retry option looks like."
+            onRetry={() => setStateFeedback('Demo retry tapped.')}
+          />
+        </AppCard>
+        <AppCard>
+          <ErrorState title="Details unavailable" message="The details couldn’t be displayed." />
+        </AppCard>
+        <AppText variant="secondaryBody" accessibilityLiveRegion="polite">{stateFeedback}</AppText>
       </View>
 
       <View style={styles.section}>

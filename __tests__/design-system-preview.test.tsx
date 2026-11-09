@@ -19,3 +19,17 @@ test('activates and resets the local preview', async () => {
   expect(screen.getByText('Demo ready.')).toBeOnTheScreen();
   expect(screen.getByRole('button', { name: 'Disabled demo' })).toBeDisabled();
 });
+
+test('shows all state examples and gives local feedback for both demo actions', async () => {
+  await render(<DesignSystemPreview />);
+
+  expect(screen.getByRole('progressbar', { name: 'Loading…' })).toBeOnTheScreen();
+  for (const name of ['Nothing here yet', 'No examples selected', 'Something didn’t load', 'Details unavailable']) {
+    expect(screen.getByRole('header', { name })).toBeOnTheScreen();
+  }
+
+  await fireEvent.press(screen.getByRole('button', { name: 'Try demo action' }));
+  expect(screen.getByText('Demo action tapped.')).toBeOnTheScreen();
+  await fireEvent.press(screen.getByRole('button', { name: 'Try again' }));
+  expect(screen.getByText('Demo retry tapped.')).toBeOnTheScreen();
+});
