@@ -19,8 +19,12 @@ test('opens Today and switches between all five named tabs', async () => {
   for (const [title, pathname] of [...destinations.slice(1), destinations[0]]) {
     await fireEvent.press(screen.getByRole(tabRole, { name: title, selected: false }));
     expect(screen).toHavePathname(pathname);
-    expect(screen.getByRole('header', { name: title })).toBeOnTheScreen();
-    expect(screen.getByRole('header', { name: 'Coming soon' })).toBeOnTheScreen();
+    if (pathname === '/') {
+      expect(screen.getByRole('header', { name: 'Your daily overview' })).toBeOnTheScreen();
+    } else {
+      expect(screen.getByRole('header', { name: title })).toBeOnTheScreen();
+      expect(screen.getByRole('header', { name: 'Coming soon' })).toBeOnTheScreen();
+    }
     expect(screen.getByRole(tabRole, { name: title, selected: true })).toBeOnTheScreen();
     expect(screen.getAllByRole(tabRole, { selected: true })).toHaveLength(1);
   }
