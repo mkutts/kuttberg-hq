@@ -24,7 +24,7 @@
       ]
     ],
     "ios": {
-      "bundleIdentifier": "com.example.kuttberghq"
+      "bundleIdentifier": "com.mkutts.kuttberghq"
     },
     "android": {
       "package": "com.example.kuttberghq"
