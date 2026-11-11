@@ -2,6 +2,52 @@
 
 PASS indicates a completed check with a successful result. FAIL indicates a completed check with an unsuccessful result. PENDING marks outstanding verification or approval. BLOCKED identifies a missing prerequisite. NOT RUN records a check that was skipped in the stated task.
 
+## Final acceptance
+
+Milestone 01 acceptance covers the app foundation and placeholder UI. Functional household data management is outside the accepted scope.
+
+### Physical devices — user-confirmed
+
+The iPhone used standalone EAS preview build `2a73b4cb-8410-42a7-a40d-aea5b7ec1e68`. The user confirmed installation and remote launch. The user also confirmed installation and independent launch of the standalone Android preview.
+
+| Check | iPhone | Android physical device |
+| --- | --- | --- |
+| Standalone preview installation and launch | PASS | PASS |
+| Today date and greeting | PASS | PASS |
+| All five tabs | PASS | PASS |
+| Settings and Back to Today | PASS | PASS |
+| Scroll through Waiting On | PASS | PASS |
+| Large-text usability | PASS with Larger Text | PASS at the largest font setting |
+| Screen-reader navigation through the tabs and Settings | PASS with VoiceOver | PASS with TalkBack |
+
+The Android emulator development-build results are recorded under Task 08. iOS Simulator verification was not run. The standalone preview results above supersede the earlier physical-device build, installation, and launch statuses.
+
+### Automated foundation audit
+
+| Check | Result |
+| --- | --- |
+| Expo Doctor | PASS, 20/20 checks |
+| Lint and strict TypeScript | PASS |
+| Jest default configuration, Android preset, and iOS preset | PASS, 30 tests under each configuration |
+| iOS and Android Hermes bundle exports | PASS |
+| EAS configuration validation | PASS |
+| Expo dependency alignment | PASS |
+
+The app is linked to its EAS project. The final EAS configuration result supersedes the Task 08 project-linking blocker. The final Expo Doctor and dependency alignment results supersede the earlier preview checkpoint results.
+
+### Accepted limitations and deferred work
+
+- Tab labels scale up to 160%. The user confirmed large-text usability on both phones.
+- The app uses a fixed light color palette.
+- Direct screen-reader checks for loading and error states were not completed.
+- The Android release permission review remains outstanding.
+- Low and moderate dependency audit findings require future review.
+- Supabase authentication, backend authorization, and data synchronization are deferred.
+
+## Historical task status
+
+The table records the status at the earlier task checkpoints. See final acceptance above for the user-confirmed standalone preview results and the scope of those checks.
+
 | Task | Android physical device | iPhone | Status |
 | --- | --- | --- | --- |
 | 01 — Repository and app foundation | PASS | PASS | Verified |
@@ -11,7 +57,7 @@ PASS indicates a completed check with a successful result. FAIL indicates a comp
 | 05 — Settings and secondary screens | PASS | PENDING | Provisionally approved |
 | 06 — Loading, empty, and error states | PASS for app regression. PENDING for direct state component checks. | PENDING | Provisionally approved |
 | 07 — Quality checks and documentation | PASS per user approval after Android device checks | PENDING | Provisionally approved |
-| 08 — Cross-platform build verification | PENDING | BLOCKED by EAS project and Apple signing prerequisites | PENDING user review |
+| 08 — Cross-platform build verification | PENDING at checkpoint | BLOCKED at checkpoint by EAS project and Apple signing prerequisites | Superseded by final acceptance for standalone previews |
 
 ## Task 07 automated checks
 
@@ -32,7 +78,7 @@ Expo’s resolved configuration disables the generated sitemap route. The design
 - **Android emulator** — PASS for startup on Today, the local date and greeting, all five tabs and selected states, and both Settings return paths in SDK 58 Expo Go on the Medium Tablet emulator. The same emulator passed at a 720 × 1600 portrait viewport with 200% system text in dark mode. The app kept its light colors, the tab labels were readable, and Today and Settings scrolled to their last sections. No JavaScript or fatal runtime errors appeared during the run. The Pixel emulator could not install Expo Go because it was low on storage.
 - **Android physical device** — NOT RUN during Task 07 workstation verification. The task table reflects the successful device checks reported later by the user.
 - **iOS Simulator** — NOT RUN. The Windows workstation has no iOS Simulator.
-- **iPhone** — NOT RUN. Physical checks for Tasks 02–07 remain PENDING.
+- **iPhone** — NOT RUN during Task 07 workstation verification.
 
 ## Accessibility
 
@@ -66,7 +112,7 @@ The Windows checkout was clean and matched the fetched milestone branch at Task 
 | `npm.cmd exec --yes -- expo-doctor` | PASS, 20 of 20 checks |
 | `npm.cmd exec -- expo config --type introspect --json` | PASS, Expo resolves the dev-client plugin and both temporary identifiers |
 | EAS CLI 27.5.0 local schema resolution | PASS, the CLI's `@expo/eas-json` library resolved both development profiles |
-| `eas config --platform android --profile development --non-interactive` and the equivalent iOS command | BLOCKED, EAS requires a linked project to resolve project-backed configuration |
+| `eas config --platform android --profile development --non-interactive` and the equivalent iOS command | BLOCKED at this checkpoint because the EAS project had yet to be linked. See final acceptance for the EAS configuration result. |
 
 The Jest runs cover Today greeting and date updates, all five tabs, Settings and its return paths, and loading, empty, and error state behavior including the optional actions.
 
@@ -77,9 +123,9 @@ The npm audit reported one low and 30 moderate advisories elsewhere in the depen
 ## Task 08 native development builds
 
 - **Android emulator** — PASS for the local x86_64 build, installation, startup, and Metro connection on the Medium Tablet emulator running Android 15. The first `expo run:android --no-bundler` attempt timed out at device discovery on ADB port 5037. A separate ADB server restored access, first on port 5039 and then on port 5041 for the final build. The first direct Gradle build failed at `:app:buildCMakeDebug[arm64-v8a]` because Ninja hit its 260-character Windows path limit. The local retry used `gradlew.bat :app:assembleDebug -Pexpo.android.cmakeObjectPathMax=240 -PreactNativeArchitectures=x86_64`. Kuttberg HQ opened its own development launcher and connected to Metro over ADB reverse port forwarding.
-- **Android physical device** — PENDING. No physical device appeared in the available ADB device list.
+- **Android physical device** — NOT RUN during this local development-build check. No physical device appeared in the available ADB device list.
 - **iOS Simulator** — NOT RUN. This workstation runs Windows.
-- **iPhone** — BLOCKED. Expo and EAS confirmed an active login, but the app has no linked EAS project and the intended account/project is unconfirmed. Apple Developer Program membership, signing access, and device registration are unconfirmed. No cloud build was submitted and no iPhone development app was installed. Confirm the Expo account/project, proposed bundle identifier `com.mkutts.kuttberghq` or another available identifier, and Apple team access before linking the project and registering the iPhone. Follow the [EAS cloud build steps](../README.md#eas-cloud-builds).
+- **iPhone** — BLOCKED at this development-build checkpoint by EAS project linking and Apple signing prerequisites. The EAS project was linked later, and the standalone preview installation and launch passed in final acceptance.
 
 The existing `com.example.kuttberghq` identifier is usable for Android debug signing. The iOS export verifies JavaScript bundling. Native signing, installation, and runtime behavior require a separate build and device check.
 
@@ -87,11 +133,11 @@ The floating Expo Tools button initially intercepted a tap on the Settings gear 
 
 ## Manual device checklist
 
-Use the same session on each available development build. iPhone checks cover the outstanding Tasks 02–07 regressions and Task 08 acceptance. Earlier Expo Go results are recorded above.
+This checklist records the development-build checks. Final standalone preview acceptance covers the specific physical-device checks listed above. Use the same session on each available development build when repeating this checklist.
 
 | Check | Android emulator | Android physical device | iPhone |
 | --- | --- | --- | --- |
-| Install and open Kuttberg HQ, connect to Metro, open Today by default, and watch for runtime exceptions or crashes throughout the session | PASS for startup and Metro. See the display-change diagnostic above. | PENDING | BLOCKED pending signed build |
+| Install and open Kuttberg HQ, connect to Metro, open Today by default, and watch for runtime exceptions or crashes throughout the session | PASS for startup and Metro. See the display-change diagnostic above. | NOT RUN at checkpoint | NOT RUN at checkpoint |
 | Check cream-and-sage colors, typography, cards, spacing, button activation and reset, and disabled control behavior using the fixture | PASS | PENDING | PENDING |
 | Open Today, Routines, Wellness, Responsibilities, and Inbox. Check selected states, the Responsibilities label and bottom safe area, and system Back to Today on Android. | PASS | PENDING | PENDING |
 | Check local greeting and date, all dashboard sections, scrolling, and refresh on resume | PASS for current greeting and date, all sections, scrolling, and resuming. A clock change across a resume is covered by Jest. | PENDING | PENDING |
@@ -100,11 +146,13 @@ Use the same session on each available development build. iPhone checks cover th
 | Enable larger system text and dark mode. Check that light colors stay readable, Today and Settings scroll, tab labels and safe areas work, and the fixture spinner, empty action, and Retry remain aligned and usable without clipping or overlap. | PASS at 200% system text in a 720 × 1600 portrait viewport | PENDING | PENDING |
 | With TalkBack or VoiceOver, swipe through the app and fixture. Listen for tab names and selected states, Settings and Back labels, headings, loading status, the error message and Retry. Check logical focus order and activate Retry. | PENDING | PENDING | PENDING |
 
-The fixture ran in the Android development app through a temporary local route. The route was removed after testing. The emulator UI hierarchy exposed tab labels and selection, the Settings and return controls, and the busy loading status. Spoken announcements and screen-reader focus order remain pending.
+The fixture ran in the Android development app through a temporary local route. The route was removed after testing. The emulator UI hierarchy exposed tab labels and selection, the Settings and return controls, and the busy loading status. The development-build checklist did not verify spoken announcements or screen-reader focus order.
 
-For direct state checks, use the [temporary development fixture route](../README.md#exercise-the-task-06-fixture-on-a-device). Enable TalkBack in Android **Settings → Accessibility → TalkBack**, or VoiceOver in iPhone **Settings → Accessibility → VoiceOver**. Increase the system text size before repeating the scrolling and layout checks. Milestone 01 acceptance remains pending.
+For direct state checks, use the [temporary development fixture route](../README.md#exercise-the-task-06-fixture-on-a-device). Enable TalkBack in Android **Settings → Accessibility → TalkBack**, or VoiceOver in iPhone **Settings → Accessibility → VoiceOver**. Increase the system text size before repeating the scrolling and layout checks.
 
 ## Standalone preview configuration
+
+This checkpoint preceded the final audit and physical-device acceptance.
 
 | Check | Result |
 | --- | --- |
@@ -117,7 +165,7 @@ For direct state checks, use the [temporary development fixture route](../README
 - **Android emulator** — Preview installation and launch were skipped.
 - **Android physical device** — Preview installation and launch were skipped.
 - **iOS Simulator** — The preview profile targets physical devices.
-- **iPhone** — Signing, installation, and launch without Metro remain unverified. No cloud build was submitted.
+- **iPhone** — No cloud build was submitted at this checkpoint. See final acceptance for the later standalone preview result.
 
 ## Expo SDK 58 dependency alignment
 
@@ -134,4 +182,4 @@ The online Expo checks agreed on seven patch-version mismatches, and npm publish
 - **Android emulator** — No device run for this checkpoint.
 - **Android physical device** — No device run for this checkpoint.
 - **iOS Simulator** — No simulator run for this checkpoint.
-- **iPhone** — Standalone preview signing, installation, and launch without Metro remain unverified. No cloud build was submitted.
+- **iPhone** — No device run for this checkpoint. See final acceptance for the later standalone preview result.
