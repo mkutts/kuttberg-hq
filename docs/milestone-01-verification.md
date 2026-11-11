@@ -118,3 +118,20 @@ For direct state checks, use the [temporary development fixture route](../README
 - **Android physical device** — Preview installation and launch were skipped.
 - **iOS Simulator** — The preview profile targets physical devices.
 - **iPhone** — Signing, installation, and launch without Metro remain unverified. No cloud build was submitted.
+
+## Expo SDK 58 dependency alignment
+
+The online Expo checks agreed on seven patch-version mismatches, and npm published all seven recommended versions. The offline Expo check used the older map bundled with the installed SDK. Expo's repair updated the lockfile and registered the default `expo-status-bar` config plugin without options. The project remains on SDK 58 with React Native 0.88.1.
+
+| Check | Result |
+| --- | --- |
+| Lint and strict TypeScript | Pass |
+| Jest default, Android, and iOS presets | Pass, 30 tests in 6 suites per preset. The first default run hit `Exceeded timeout of 5000 ms for a test.` in the Today greeting test while Metro was exporting. It passed on a standalone rerun. |
+| Online Expo dependency validation | Pass. `Dependencies are up to date` |
+| Online Expo Doctor | Pass, 20/20. The initial restricted run could not resolve the npm registry (`ENOTFOUND`). The online run before repair passed 19/20. |
+| Android and iOS bundle exports | Pass. Metro reported `Unable to deserialize cloned data`, then rebuilt its cache and exported Hermes bundles for both platforms. |
+
+- **Android emulator** — No device run for this checkpoint.
+- **Android physical device** — No device run for this checkpoint.
+- **iOS Simulator** — No simulator run for this checkpoint.
+- **iPhone** — Standalone preview signing, installation, and launch without Metro remain unverified. No cloud build was submitted.

@@ -21,7 +21,8 @@
         {
           "toolsButton": false
         }
-      ]
+      ],
+      "expo-status-bar"
     ],
     "ios": {
       "bundleIdentifier": "com.mkutts.kuttberghq",
