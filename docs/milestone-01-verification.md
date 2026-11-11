@@ -103,3 +103,18 @@ Use the same session on each available development build. iPhone checks cover th
 The fixture ran in the Android development app through a temporary local route. The route was removed after testing. The emulator UI hierarchy exposed tab labels and selection, the Settings and return controls, and the busy loading status. Spoken announcements and screen-reader focus order remain pending.
 
 For direct state checks, use the [temporary development fixture route](../README.md#exercise-the-task-06-fixture-on-a-device). Enable TalkBack in Android **Settings → Accessibility → TalkBack**, or VoiceOver in iPhone **Settings → Accessibility → VoiceOver**. Increase the system text size before repeating the scrolling and layout checks. Milestone 01 acceptance remains pending.
+
+## Standalone preview configuration
+
+| Check | Result |
+| --- | --- |
+| Lint, strict TypeScript, and public Expo config | Pass |
+| Jest default, Android, and iOS presets | Pass, 30 tests per preset |
+| iOS EAS preview config | Pass. EAS resolved internal distribution, `developmentClient: false`, and `simulator: false`. The profile has no parent. |
+| Expo dependency validation and Expo Doctor | The online checks flagged seven existing SDK 58 patch-version mismatches in `expo`, `expo-constants`, `expo-dev-client`, `expo-font`, `expo-linking`, `expo-router`, and `expo-status-bar`. Expo Doctor passed 19 of 20 checks. |
+| Android and iOS bundle exports | Pass on retry with Hermes bytecode and assets for both platforms. The initial restricted-runner export failed during Hermes compilation. |
+
+- **Android emulator** — Preview installation and launch were skipped.
+- **Android physical device** — Preview installation and launch were skipped.
+- **iOS Simulator** — The preview profile targets physical devices.
+- **iPhone** — Signing, installation, and launch without Metro remain unverified. No cloud build was submitted.

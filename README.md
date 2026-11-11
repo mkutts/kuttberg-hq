@@ -49,13 +49,23 @@ If Ninja reports `Filename longer than 260 characters`, open PowerShell in the g
 
 ### EAS cloud builds
 
-The sole EAS profile, `development`, uses the EAS development environment and internal distribution. It produces an Android APK and targets a physical iPhone for iOS. Confirm which Expo account and project should own the builds, and verify build allowance or cost before submitting either build.
+The `development` profile uses the EAS development environment and internal distribution. It produces an Android APK and targets a physical iPhone for iOS. Confirm which Expo account and project should own the builds, and verify build allowance or cost before submitting either build.
 
 1. Run `npx eas-cli whoami`. If signed out, run `npx eas-cli login` and enter credentials in the terminal or browser prompt. Use `npx eas-cli init --id <project-id>` to link the approved existing EAS project, or run `npx eas-cli init` and select the approved owner if a new project is needed. Confirm the link with `npx eas-cli project:info`.
 2. For **Android**, run `npx eas-cli build --profile development --platform android`. Open the build link on the phone and install the APK. For an emulator, download the APK and run `adb install <path-to-apk>`.
 3. For **iPhone**, confirm active Apple Developer Program membership, a team member with signing access, and an available bundle identifier. Run `npx eas-cli device:create` and follow its registration link on the test iPhone. Then run `npx eas-cli build --profile development --platform ios` interactively so EAS can prepare the signing certificate and an ad hoc provisioning profile that includes that iPhone. Open the build link on the registered phone to install and enable Developer Mode if prompted. Windows can submit this cloud build. Running the iOS Simulator requires a Mac. See [Expo's physical iPhone workflow](https://docs.expo.dev/tutorial/eas/ios-development-build-for-devices/).
 
-Both platforms currently use `com.example.kuttberghq`. It is suitable for locally debug-signed Android builds. Before the first iOS signing setup, confirm a stable identifier such as `com.mkutts.kuttberghq` and check its availability on the intended Apple team. Coordinate any change with Android as well, since changing an identifier changes the installed app's identity.
+The iOS bundle identifier is `com.mkutts.kuttberghq`. Use that identifier for signing on the intended Apple team. The Android package is `com.example.kuttberghq`.
+
+### Install a standalone preview on iPhone
+
+The `development` build requires Metro to load the app during development. The `preview` build bundles JavaScript and assets so the installed app opens directly from its icon without Metro.
+
+```sh
+npx eas-cli@latest build --platform ios --profile preview
+```
+
+Run the build interactively when ready to create the preview. Your wife's registered iPhone must be included in the Ad Hoc provisioning profile used to sign the build. Select her device when EAS prompts for devices, then open the resulting installation link on her iPhone. See [Expo's internal distribution guide](https://docs.expo.dev/build/internal-distribution/).
 
 ### Connect to Metro
 
