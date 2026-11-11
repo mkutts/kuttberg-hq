@@ -24,7 +24,10 @@
       ]
     ],
     "ios": {
-      "bundleIdentifier": "com.mkutts.kuttberghq"
+      "bundleIdentifier": "com.mkutts.kuttberghq",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.example.kuttberghq"
