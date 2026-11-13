@@ -31,17 +31,18 @@ test('the visible back control returns to Today when Settings is opened directly
   expect(screen.getByRole('header', { name: 'Your daily overview' })).toBeOnTheScreen();
 });
 
-test('shows configured app information and keeps future preferences informational', async () => {
+test('shows app information, the App Updates section, and informational future preferences', async () => {
   await renderRouter('app', { initialUrl: '/settings' });
 
   expect(screen.getByRole('header', { name: config.expo.name })).toBeOnTheScreen();
-  expect(screen.getByText(`Version ${config.expo.version}`)).toBeOnTheScreen();
   expect(screen.getByText('Your household command center.')).toBeOnTheScreen();
+  expect(screen.getByRole('header', { name: 'App Updates' })).toBeOnTheScreen();
+  expect(screen.getByText(/^Installed version /)).toBeOnTheScreen();
+  expect(screen.getByText(/^Build number /)).toBeOnTheScreen();
   for (const name of ['Notifications', 'Appearance preferences', 'Account settings']) {
     expect(screen.getByText(name)).toBeOnTheScreen();
   }
   expect(screen.getAllByText('Coming later')).toHaveLength(3);
-  expect(screen.getAllByRole('button')).toEqual([screen.getByRole('button', { name: 'Back to Today' })]);
   expect(screen.queryByRole('switch')).toBeNull();
   expect(screen.getByText(/private accounts and household data synchronization are planned/i)).toBeOnTheScreen();
 });

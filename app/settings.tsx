@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import config from '../app.json';
+import { AppUpdatesSection } from '../src/components/AppUpdatesSection';
 import { AppButton } from '../src/components/ui/AppButton';
 import { AppCard } from '../src/components/ui/AppCard';
 import { AppScreen } from '../src/components/ui/AppScreen';
@@ -12,7 +13,7 @@ import { colors, spacing } from '../src/theme';
 const futurePreferences = ['Notifications', 'Appearance preferences', 'Account settings'];
 
 export default function SettingsScreen() {
-  const { name, version } = config.expo;
+  const { name } = config.expo;
 
   return (
     <AppScreen scroll contentStyle={styles.content}>
@@ -27,8 +28,9 @@ export default function SettingsScreen() {
 
       <AppCard style={styles.appInfo}>
         <SectionHeader title={name} description="Your household command center." />
-        <AppText variant="caption">Version {version}</AppText>
       </AppCard>
+
+      <AppUpdatesSection />
 
       <AppCard style={styles.preferences}>
         <SectionHeader title="Future preferences" />
@@ -51,7 +53,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   content: { width: '100%', maxWidth: 600, alignSelf: 'center', gap: spacing.xl },
   back: { alignSelf: 'flex-start', maxWidth: '100%' },
-  appInfo: { backgroundColor: colors.secondaryPressed, gap: spacing.sm },
+  appInfo: { backgroundColor: colors.secondaryPressed },
   preferences: { gap: spacing.md },
   preference: {
     borderTopWidth: StyleSheet.hairlineWidth,
