@@ -2,7 +2,14 @@
   "expo": {
     "name": "Kuttberg HQ",
     "slug": "kuttberg-hq",
-    "version": "1.0.0",
+    "version": "1.1.0",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/32c14ce4-a3e8-4dcd-af19-49cdc676b3bb",
+      "checkAutomatically": "NEVER"
+    },
     "platforms": [
       "ios",
       "android"

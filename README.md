@@ -11,7 +11,7 @@ Task 08 adds development-build setup for both platforms. See the [milestone veri
 - **Settings** shows the app version, planned preferences, and privacy information. The gear on Today opens Settings, and **Back to Today** returns to the tabs.
 - **Shared UI** includes theme tokens, buttons, cards, headings, safe-area screens, and reusable loading, empty, and error states. The design-system fixture exercises the states and demo actions under Jest. It lives in `src/dev/DesignSystemPreview.tsx`, outside the app routes.
 
-Authentication, Supabase, household data storage and sync, functional household tasks, notifications, reminders, and AI are planned for later milestones. The current milestone has no household data or production service configuration.
+Authentication, Supabase, household data storage and sync, functional household tasks, notifications, reminders, and AI are planned for later milestones.
 
 ## Install and run with Expo Go
 
@@ -73,6 +73,24 @@ Run `npm run start:dev` if Metro is not already running. Put the test phone and 
 
 The floating Expo Tools button is disabled because it covered the Settings gear on narrow screens. Shake a physical test phone to open the developer menu.
 
+## EAS Update infrastructure
+
+The project `mkutts/kuttberg-hq` uses `https://u.expo.dev/32c14ce4-a3e8-4dcd-af19-49cdc676b3bb` for updates. New standalone builds select updates by platform, channel, and runtime version.
+
+| Build profile | Distribution | Update channel | EAS environment |
+| --- | --- | --- | --- |
+| `development` | Internal development client with Metro | No fixed channel | `development` |
+| `preview` | Internal standalone build for physical iPhone and Android | `preview` | `preview` |
+| `production` | Store build for approved releases | `production` | `production` |
+
+The `appVersion` runtime policy uses `expo.version`. The first OTA-enabled builds use app and runtime version `1.1.0`, distinct from the previous `1.0.0` installs. Build numbers and Android version codes are managed separately from this runtime policy. When the Expo SDK, native dependencies, permissions, config plugins, or other native configuration change, bump `expo.version` and create new approved native builds for the affected platforms before publishing updates for that runtime. Keep the same runtime for compatible JavaScript and bundled asset changes. [Expo runtime version guide](https://docs.expo.dev/eas-update/runtime-versions/)
+
+Standalone builds start immediately with a cached or embedded bundle. `updates.checkAutomatically` is `NEVER`, so there is no automatic server check at launch. Task 02.4 will add the Settings action to check with `checkForUpdateAsync()`, download with `fetchUpdateAsync()`, and apply with `reloadAsync()`. It can handle rejected promises and use `readLogEntriesAsync()` for diagnostics, with `isEnabled`, `channel`, `runtimeVersion`, `updateId`, and `isEmbeddedLaunch` available to identify the running build or update. Expo Go and Metro development clients have no fixed channel and lack the full standalone update API. Test the Settings flow on standalone preview builds. [Expo SDK 58 Updates API](https://docs.expo.dev/versions/v58.0.0/sdk/updates/)
+
+Every OTA publication requires explicit owner approval and a manual release. GitHub Actions and EAS Workflows must never publish updates for this project. Use the environment that matches the approved channel and verify the channel's branch mapping and runtime before publishing. Before the first release, the owner must confirm the linked EAS project, remote channel mappings, environment values, signing access, and any connected release automation. The environments can have different values and the profiles can use different signing credentials. Keep secrets out of app config, source, and client bundles.
+
+Validate without publishing by running the quality checks below and `npx expo config --type introspect --json`. Confirm the generated iOS plist and Android manifest/resources show updates enabled, the project URL, launch checking set to `NEVER`, and the intended runtime. Review both standalone profiles in `eas.json`. With authenticated EAS access, use `npx eas-cli project:info`, `npx eas-cli channel:list`, and `npx eas-cli config --platform <ios|android> --profile <preview|production> --non-interactive` to inspect remote project/channel state and resolved profiles without submitting builds. Check environment configuration in the Expo dashboard.
+
 ## Device verification
 
 ### Milestone 02 branding
@@ -80,6 +98,10 @@ The floating Expo Tools button is disabled because it covered the Settings gear 
 The launcher icons and native splash use the approved Frances artwork. The `expo-splash-screen` plugin in `app.json` centers the transparent artwork at a width of 200 on a `#FEEED0` cream background on both platforms.
 
 When standalone preview builds are available, verify the **Kuttberg HQ** home-screen label and Frances icon on both phones. On Android, check the icon in the launcher and app drawer, and confirm the new package installs alongside the previous preview. Fully close and cold-launch each app to check the centered artwork on the cream splash background. Then verify that Today, the five tabs, and Settings open as expected.
+
+### Milestone 02 OTA verification
+
+After separate approval for native builds and a preview publication, install new `1.1.0` standalone preview builds on a physical iPhone and Android phone. Verify cold launch with Metro disconnected and confirm the `preview` channel and expected runtime. Once Task 02.4 is complete, check, download, and restart into an approved compatible preview update on each phone. Confirm the updated content or update ID, and verify that updates from a different channel or runtime are excluded. Production delivery requires its own approved release verification.
 
 ### App navigation and accessibility
 
