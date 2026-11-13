@@ -8,6 +8,7 @@
       "android"
     ],
     "scheme": "kuttberg-hq",
+    "icon": "./assets/images/KuttbergHQ_iOS_App_Icon_1024.png",
     "plugins": [
       [
         "expo-router",
@@ -22,16 +23,31 @@
           "toolsButton": false
         }
       ],
-      "expo-status-bar"
+      "expo-status-bar",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/KuttbergHQ_Splash_Screen_Logo_1024_Transparent.png",
+          "backgroundColor": "#FEEED0",
+          "imageWidth": 200,
+          "resizeMode": "contain"
+        }
+      ]
     ],
     "ios": {
       "bundleIdentifier": "com.mkutts.kuttberghq",
+      "icon": "./assets/images/KuttbergHQ_iOS_App_Icon_1024.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
-      "package": "com.example.kuttberghq"
+      "package": "com.mkutts.kuttberghq",
+      "icon": "./assets/images/KuttbergHQ_Android_Legacy_App_Icon_1024.png",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/KuttbergHQ_Android_Adaptive_Foreground_1024.png",
+        "backgroundImage": "./assets/images/KuttbergHQ_Android_Adaptive_Background_1024.png"
+      }
     },
     "extra": {
       "router": {

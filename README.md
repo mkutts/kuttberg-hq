@@ -55,7 +55,7 @@ The `development` profile uses the EAS development environment and internal dist
 2. For **Android**, run `npx eas-cli build --profile development --platform android`. Open the build link on the phone and install the APK. For an emulator, download the APK and run `adb install <path-to-apk>`.
 3. For **iPhone**, confirm active Apple Developer Program membership, a team member with signing access, and an available bundle identifier. Run `npx eas-cli device:create` and follow its registration link on the test iPhone. Then run `npx eas-cli build --profile development --platform ios` interactively so EAS can prepare the signing certificate and an ad hoc provisioning profile that includes that iPhone. Open the build link on the registered phone to install and enable Developer Mode if prompted. Windows can submit this cloud build. Running the iOS Simulator requires a Mac. See [Expo's physical iPhone workflow](https://docs.expo.dev/tutorial/eas/ios-development-build-for-devices/).
 
-The iOS bundle identifier is `com.mkutts.kuttberghq`. Use that identifier for signing on the intended Apple team. The Android package is `com.example.kuttberghq`.
+The iOS bundle identifier and Android application ID are both `com.mkutts.kuttberghq`. Use the iOS identifier with the intended Apple team. On Android, the new ID installs as a separate app from the `com.example.kuttberghq` preview and starts with its own local data. Both installs can handle `kuttberg-hq://` links if they coexist. Future updates to the new Android installation require compatible signing. Verify package ownership in Google Play Console and the intended Android signing credentials in EAS before distribution.
 
 ### Install a standalone preview on iPhone
 
@@ -69,11 +69,19 @@ Run the build interactively when ready to create the preview. Your wife's regist
 
 ### Connect to Metro
 
-Run `npm run start:dev` if Metro is not already running. Put the test phone and computer on the same Wi-Fi network, open the installed Kuttberg HQ app, and scan the Metro QR code or select the server in its launcher. In an Android emulator, press **a** in the Metro terminal. If a phone cannot reach the server over Wi-Fi, use `npm run start:dev -- --tunnel` or check the local network and firewall. Rebuild the development client after changing native dependencies or native app configuration. If the ignored `android/` folder already exists, run `npx expo prebuild --platform android` to apply app configuration changes before rebuilding locally.
+Run `npm run start:dev` if Metro is not already running. Put the test phone and computer on the same Wi-Fi network, open the installed Kuttberg HQ app, and scan the Metro QR code or select the server in its launcher. In an Android emulator, press **a** in the Metro terminal. If a phone cannot reach the server over Wi-Fi, use `npm run start:dev -- --tunnel` or check the local network and firewall. Rebuild the development client after changing native dependencies or native app configuration. The ignored `android/` folder generated for the previous preview may still contain `com.example.kuttberghq`. Preserve any local native edits you need, then regenerate that folder with `npx expo prebuild --platform android` before rebuilding locally. In SDK 58, the command regenerates the folder by default.
 
 The floating Expo Tools button is disabled because it covered the Settings gear on narrow screens. Shake a physical test phone to open the developer menu.
 
 ## Device verification
+
+### Milestone 02 branding
+
+The launcher icons and native splash use the approved Frances artwork. The `expo-splash-screen` plugin in `app.json` centers the transparent artwork at a width of 200 on a `#FEEED0` cream background on both platforms.
+
+When standalone preview builds are available, verify the **Kuttberg HQ** home-screen label and Frances icon on both phones. On Android, check the icon in the launcher and app drawer, and confirm the new package installs alongside the previous preview. Fully close and cold-launch each app to check the centered artwork on the cream splash background. Then verify that Today, the five tabs, and Settings open as expected.
+
+### App navigation and accessibility
 
 1. Open the app on each phone and confirm it starts on Today. Check the local greeting and date. Scroll through **Your daily overview**, **Up Next**, **Routines**, **Responsibilities**, and **Waiting On**.
 2. Open all four secondary tabs. Check the heading, purpose statement, and **Coming soon** card. Confirm the selected tab shows an outline and its label is readable. On Android, use system Back from a secondary tab and confirm it returns to Today.
@@ -89,7 +97,7 @@ With a development build already installed, create a temporary local file named 
 export { default } from '../src/dev/DesignSystemPreview';
 ```
 
-Start Metro with `npm run start:dev`, connect the installed app, then open `kuttberg-hq://dev-state-preview` on the device. On an Android emulator, run `adb shell am start -a android.intent.action.VIEW -d kuttberg-hq://dev-state-preview com.example.kuttberghq`. On iPhone, open the link from a local note and accept the prompt. Delete only the temporary file when finished, before exporting, building, or staging changes. The Jest fixture remains available at `src/dev/DesignSystemPreview.tsx`.
+Start Metro with `npm run start:dev`, connect the installed app, then open `kuttberg-hq://dev-state-preview` on the device. On an Android emulator, run `adb shell am start -a android.intent.action.VIEW -d kuttberg-hq://dev-state-preview com.mkutts.kuttberghq`. On iPhone, open the link from a local note and accept the prompt. Delete only the temporary file when finished, before exporting, building, or staging changes. The Jest fixture remains available at `src/dev/DesignSystemPreview.tsx`.
 
 ## Quality checks
 
