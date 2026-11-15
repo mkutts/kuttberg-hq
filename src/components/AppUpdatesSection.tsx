@@ -107,6 +107,7 @@ export function AppUpdatesSection() {
       <View>
         <AppText variant="caption">Installed version {updates.version ?? 'Unavailable'}</AppText>
         <AppText variant="caption">Build number {updates.build ?? 'Unavailable'}</AppText>
+        <AppText variant="caption">OTA Test: Milestone 02</AppText>
       </View>
       <AppText
         accessibilityLiveRegion="polite"
