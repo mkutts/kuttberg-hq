@@ -11,11 +11,26 @@ Task 08 adds development-build setup for both platforms. See the [milestone veri
 - **Settings** shows installed app and build information, manual app updates, planned preferences, and privacy information. The gear on Today opens Settings, and **Back to Today** returns to the tabs.
 - **Shared UI** includes theme tokens, buttons, cards, headings, safe-area screens, and reusable loading, empty, and error states. The design-system fixture exercises the states and demo actions under Jest. It lives in `src/dev/DesignSystemPreview.tsx`, outside the app routes.
 
-Authentication, Supabase, household data storage and sync, functional household tasks, notifications, reminders, and AI are planned for later milestones.
+Authentication, household data storage and sync, functional household tasks, notifications, reminders, and AI are planned for later milestones.
 
 ## Milestone 02
 
 Kuttberg HQ has official Frances branding and manual app updates. See the [Milestone 02 closure report](docs/milestone-02-closure.md) for the owner-reported iPhone and Android results and preview update record. Use the [release and rollback playbook](docs/release-playbook.md) for future releases.
+
+## Milestone 03 development Supabase setup
+
+1. Create a separate development project in the [Supabase Dashboard](https://supabase.com/dashboard). Keep the database password in your password manager. Keep public signup disabled for controlled account enrollment. Account creation belongs to a later task.
+2. In the project's **Connect** dialog, copy the **Project URL** and the **Publishable key**. Use the HTTPS origin, such as `https://YOUR_PROJECT_REF.supabase.co`, and the key with the `sb_publishable_` prefix. See the [Supabase Expo quickstart](https://supabase.com/docs/guides/getting-started/quickstarts/expo-react-native).
+3. From the repository root, copy `.env.example` to `.env.local` and replace both placeholders. Keep `.env.local` out of Git. Expo inlines `EXPO_PUBLIC_` values into the JavaScript bundle, so reserve these variables for the project URL and publishable key. Keep secret and service-role keys, database passwords, user passwords, and access and refresh tokens out of app config, client code, and logs. Database RLS will enforce access in a later task. See [Expo environment variables](https://docs.expo.dev/guides/environment-variables/) and [Supabase API keys](https://supabase.com/docs/guides/getting-started/api-keys).
+4. Run `npm ci` and `npm start`, then launch the app in SDK 58 Expo Go. Task 01 leaves the dashboard independent of Supabase, so it should open with or without `.env.local`. Restart Metro after editing the file for verification.
+
+`getSupabaseClient()` in `src/supabase/client.ts` validates the two settings on first use and returns one client per JavaScript runtime. Missing and malformed settings produce errors naming the affected setting. Construction leaves session restoration, automatic refresh, and URL-based sign-in detection disabled. On iOS and Android, the supplied storage adapter uses Expo SecureStore for session data. It splits large entries into small encrypted items and uses device-only Keychain accessibility while unlocked on iOS. The Expo config plugin excludes SecureStore data from Android backup. iOS Keychain data can survive uninstall, so reinstalling is an unreliable way to clear a session. Other platforms use SDK in-memory storage. Avoid using real accounts or household data until authorization is implemented and tested.
+
+Run `npm test -- supabase-` to exercise validation, lazy client wiring, and storage behavior with mocks. To verify actual SDK initialization, make a temporary local `app/dev-supabase-check.tsx` route following the development fixture pattern under **Device verification**. Have it call `getSupabaseClient()` when opened and display a success label or the configuration error message. Use SDK 58 Expo Go on both phones to check configured, missing, and malformed values, and confirm Today, the other four tabs, and Settings still open. Remove the temporary route before staging. SDK construction checks local configuration shape. Verifying that the URL and key belong to the same project requires a backend request in a later task.
+
+The Milestone 02 standalone iOS and Android binaries were built before SecureStore was added. An OTA update cannot add that native module. Before releasing code that loads SecureStore, bump the Expo app version so the existing `appVersion` policy assigns a runtime distinct from `1.1.0`. Build and verify new iOS and Android binaries with SecureStore on the preview channel before publishing a compatible update. See [Expo SecureStore](https://docs.expo.dev/versions/v58.0.0/sdk/securestore/) and the [Expo runtime version guide](https://docs.expo.dev/eas-update/runtime-versions/).
+
+Tasks 02–06 cover later account and data work. Task 01 defers controlled enrollment, sign-in and sign-out, recovery, profiles, shared and private workspace data, migrations, and RLS. Task 03 owns the app's session lifecycle, including explicit `auth.initialize()`, foreground refresh, restoration, and device verification of session persistence and removal. Household features, notifications, AI, and production deployment remain outside Task 01.
 
 ## Install and run with Expo Go
 

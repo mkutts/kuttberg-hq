@@ -25,6 +25,13 @@
       ],
       "expo-font",
       [
+        "expo-secure-store",
+        {
+          "configureAndroidBackup": true,
+          "faceIDPermission": false
+        }
+      ],
+      [
         "expo-dev-client",
         {
           "toolsButton": false
