@@ -13,6 +13,10 @@ Task 08 adds development-build setup for both platforms. See the [milestone veri
 
 Authentication, Supabase, household data storage and sync, functional household tasks, notifications, reminders, and AI are planned for later milestones.
 
+## Milestone 02
+
+Kuttberg HQ has official Frances branding and manual app updates. See the [Milestone 02 closure report](docs/milestone-02-closure.md) for the owner-reported iPhone and Android results and preview update record. Use the [release and rollback playbook](docs/release-playbook.md) for future releases.
+
 ## Install and run with Expo Go
 
 Install Git and a supported Node.js LTS release with npm. Use Node 22.13 or newer on the Node 22 line, or Node 24.3 or later on the Node 24 line. From the repository root:
@@ -87,11 +91,9 @@ The `appVersion` runtime policy uses `expo.version`. Task 02.3 configured app an
 
 Standalone builds start immediately with a cached or embedded bundle. `updates.checkAutomatically` is `NEVER`, so there is no automatic server check at launch. In **Settings → App Updates**, **Check for Updates** calls `checkForUpdateAsync()`. When Expo offers a compatible update, **Download Update** calls `fetchUpdateAsync()`. A confirmed download enables **Restart to Update**, which calls `reloadAsync()` when pressed. Expo can also load a downloaded update on the next cold start. In Expo Go and Metro, Settings explains which builds support manual updates. **Show Update Details** displays the channel, runtime, and currently running update ID when available. [Expo SDK 58 Updates API](https://docs.expo.dev/versions/v58.0.0/sdk/updates/)
 
-Task 02.4 adds `expo-application` to read installed version and build metadata from the native binary. Before releasing this change, bump `expo.version` above `1.1.0` and create separately approved native builds for iOS and Android. Publish this code only for the new runtime that includes the module. [Expo SDK 58 Application API](https://docs.expo.dev/versions/v58.0.0/sdk/application/)
+Task 02.4 added `expo-application` to read installed version and build metadata from the native binary. The owner-tested `1.1.0` preview binaries for iPhone and Android include this native module. The Milestone 02 test update delivered a JavaScript-only Settings caption to both installed previews. [Expo SDK 58 Application API](https://docs.expo.dev/versions/v58.0.0/sdk/application/)
 
-Every OTA publication requires explicit owner approval and a manual release. GitHub Actions and EAS Workflows must never publish updates for this project. Use the environment that matches the approved channel and verify the channel's branch mapping and runtime before publishing. Before the first release, the owner must confirm the linked EAS project, remote channel mappings, environment values, signing access, and any connected release automation. The environments can have different values and the profiles can use different signing credentials. Keep secrets out of app config, source, and client bundles.
-
-Validate without publishing by running the quality checks below and `npx expo config --type introspect --json`. Confirm the generated iOS plist and Android manifest/resources show updates enabled, the project URL, launch checking set to `NEVER`, and the intended runtime. Review both standalone profiles in `eas.json`. With authenticated EAS access, use `npx eas-cli project:info`, `npx eas-cli channel:list`, and `npx eas-cli config --platform <ios|android> --profile <preview|production> --non-interactive` to inspect remote project/channel state and resolved profiles without submitting builds. Check environment configuration in the Expo dashboard.
+Every OTA publication requires explicit owner approval. The [release and rollback playbook](docs/release-playbook.md) covers target verification, manual publication, and recovery.
 
 ## Device verification
 
