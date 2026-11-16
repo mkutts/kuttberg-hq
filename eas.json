@@ -17,9 +17,16 @@
     "preview": {
       "distribution": "internal",
       "developmentClient": false,
+      "channel": "preview",
+      "environment": "preview",
       "ios": {
         "simulator": false
       }
+    },
+    "production": {
+      "distribution": "store",
+      "channel": "production",
+      "environment": "production"
     }
   }
 }
