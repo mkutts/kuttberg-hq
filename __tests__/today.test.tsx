@@ -1,6 +1,8 @@
 import { act, fireEvent, renderRouter, screen } from 'expo-router/testing-library';
 import { AppState, Platform } from 'react-native';
 
+jest.mock('../src/auth/AuthProvider', () => jest.requireActual('../test-support/signedInAuth'));
+
 const tabRole = Platform.OS === 'ios' ? 'button' : 'tab';
 const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: 'full' });
 

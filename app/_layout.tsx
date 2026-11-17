@@ -1,6 +1,10 @@
 import { DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
+import { AuthProvider, useAuth } from '../src/auth/AuthProvider';
+import { ErrorState } from '../src/components/states/ErrorState';
+import { LoadingState } from '../src/components/states/LoadingState';
+import { AppScreen } from '../src/components/ui/AppScreen';
 import { colors } from '../src/theme';
 import { AppUpdatesProvider } from '../src/updates/useAppUpdates';
 
@@ -22,11 +26,27 @@ export default function RootLayout() {
     <ThemeProvider value={lightTheme}>
       <StatusBar style="dark" />
       <AppUpdatesProvider>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="settings" />
-        </Stack>
+        <AuthProvider><AuthenticatedNavigation /></AuthProvider>
       </AppUpdatesProvider>
     </ThemeProvider>
+  );
+}
+
+function AuthenticatedNavigation() {
+  const { status, message, retry } = useAuth();
+  if (status === 'loading') return <AppScreen><LoadingState message="Restoring your secure session…" /></AppScreen>;
+  if (status === 'unavailable') {
+    return <AppScreen><ErrorState title="Unable to restore session" message={message ?? undefined} onRetry={retry} /></AppScreen>;
+  }
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={status === 'signedIn'}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="settings" />
+      </Stack.Protected>
+      <Stack.Protected guard={status === 'signedOut'}>
+        <Stack.Screen name="sign-in" />
+      </Stack.Protected>
+    </Stack>
   );
 }

@@ -2,6 +2,7 @@ import { router } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
 import config from '../app.json';
+import { useAuth } from '../src/auth/AuthProvider';
 import { AppUpdatesSection } from '../src/components/AppUpdatesSection';
 import { AppButton } from '../src/components/ui/AppButton';
 import { AppCard } from '../src/components/ui/AppCard';
@@ -14,6 +15,7 @@ const futurePreferences = ['Notifications', 'Appearance preferences', 'Account s
 
 export default function SettingsScreen() {
   const { name } = config.expo;
+  const { signOut, busy, message } = useAuth();
 
   return (
     <AppScreen scroll contentStyle={styles.content}>
@@ -33,6 +35,13 @@ export default function SettingsScreen() {
       <AppUpdatesSection />
 
       <AppCard style={styles.preferences}>
+        <SectionHeader title="Your session" description="Sign out securely on this device and end your other signed-in sessions." />
+        {message && <AppText accessibilityRole="alert" accessibilityLiveRegion="polite" style={{ color: colors.error }}>{message}</AppText>}
+        <AppButton label={busy === 'signOut' ? 'Signing out…' : 'Sign out'}
+          loading={busy === 'signOut'} onPress={() => void signOut()} variant="secondary" />
+      </AppCard>
+
+      <AppCard style={styles.preferences}>
         <SectionHeader title="Future preferences" />
         {futurePreferences.map((label) => (
           <View key={label} style={styles.preference}>
@@ -44,7 +53,7 @@ export default function SettingsScreen() {
 
       <SectionHeader
         title="Privacy"
-        description="Private accounts and household data synchronization are planned for later milestones."
+        description="Your session is stored securely on this device. Household data access is enforced by the server; synchronization is planned for a later task."
       />
     </AppScreen>
   );

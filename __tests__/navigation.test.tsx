@@ -1,6 +1,8 @@
 import { fireEvent, renderRouter, screen, testRouter } from 'expo-router/testing-library';
 import { Platform } from 'react-native';
 
+jest.mock('../src/auth/AuthProvider', () => jest.requireActual('../test-support/signedInAuth'));
+
 const destinations = [
   ['Today', '/', 'Your day, at a glance.'],
   ['Routines', '/routines', 'Keep everyday life running smoothly.'],
