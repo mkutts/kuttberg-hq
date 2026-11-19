@@ -40,6 +40,14 @@ export function mockAuthClient(initialSession: Session | null = null) {
     }),
     startAutoRefresh: jest.fn(async () => {}),
     stopAutoRefresh: jest.fn(async () => {}),
+    resetPasswordForEmail: jest.fn(async (_email: string, _options: { redirectTo: string }): Promise<{ data: object | null; error: unknown }> => ({ data: {}, error: null })),
+    verifyOtp: jest.fn(async (_params: { token_hash: string; type: 'recovery' }): Promise<{ data: { session: Session | null; user: Session['user'] | null }; error: unknown }> => {
+      const session = testSession();
+      emit('PASSWORD_RECOVERY', session);
+      return { data: { session, user: session.user }, error: null };
+    }),
+    getUser: jest.fn(async (): Promise<{ data: { user: Session['user'] | null }; error: unknown }> => ({ data: { user: savedSession?.user ?? null }, error: null })),
+    updateUser: jest.fn(async (_params: { password: string }): Promise<{ data: { user: Session['user'] | null }; error: unknown }> => ({ data: { user: savedSession?.user ?? null }, error: null })),
   };
   return { auth, client: { auth } as unknown as SupabaseClient, emit, unsubscribe };
 }

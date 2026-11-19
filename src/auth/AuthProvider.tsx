@@ -6,7 +6,9 @@ const AuthContext = createContext<ReturnType<typeof useAuthValue> | null>(null);
 
 function useAuthValue() {
   const state = useSyncExternalStore(authController.subscribe, authController.getSnapshot);
-  return { ...state, signIn: authController.signIn, signOut: authController.signOut, retry: authController.retry };
+  return { ...state, signIn: authController.signIn, signOut: authController.signOut, retry: authController.retry,
+    requestRecovery: authController.requestRecovery, updateRecoveryPassword: authController.updateRecoveryPassword,
+    finishRecovery: authController.finishRecovery };
 }
 
 export function AuthProvider({ children }: PropsWithChildren) {

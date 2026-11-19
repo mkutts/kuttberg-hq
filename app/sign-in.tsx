@@ -1,4 +1,5 @@
 import { type ComponentRef, useRef, useState } from 'react';
+import { router } from 'expo-router';
 import { Image, Keyboard, StyleSheet, TextInput, View } from 'react-native';
 
 import { useAuth } from '../src/auth/AuthProvider';
@@ -70,6 +71,7 @@ export default function SignInScreen() {
         </View>
         {(validation || message) && <AppText accessibilityRole="alert" accessibilityLiveRegion="polite" style={styles.error}>{validation || message}</AppText>}
         <AppButton label={submitting ? 'Signing in…' : 'Sign in'} loading={submitting} onPress={() => void submit()} />
+        <AppButton label="Forgot password?" variant="secondary" disabled={Boolean(busy)} onPress={() => router.push('/forgot-password')} />
         <AppText variant="caption">Access is limited to accounts enrolled by your household administrator.</AppText>
       </AppCard>
     </AppScreen>
