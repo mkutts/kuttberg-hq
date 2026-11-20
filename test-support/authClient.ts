@@ -4,7 +4,7 @@ export function testSession(): Session {
   return {
     access_token: 'synthetic-access-token', refresh_token: 'synthetic-refresh-token', token_type: 'bearer',
     expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600,
-    user: { id: 'synthetic-user', aud: 'authenticated', app_metadata: {}, user_metadata: {}, created_at: '' },
+    user: { id: 'synthetic-user', email: 'person@example.invalid', aud: 'authenticated', app_metadata: {}, user_metadata: {}, created_at: '' },
   };
 }
 
@@ -40,8 +40,8 @@ export function mockAuthClient(initialSession: Session | null = null) {
     }),
     startAutoRefresh: jest.fn(async () => {}),
     stopAutoRefresh: jest.fn(async () => {}),
-    resetPasswordForEmail: jest.fn(async (_email: string, _options: { redirectTo: string }): Promise<{ data: object | null; error: unknown }> => ({ data: {}, error: null })),
-    verifyOtp: jest.fn(async (_params: { token_hash: string; type: 'recovery' }): Promise<{ data: { session: Session | null; user: Session['user'] | null }; error: unknown }> => {
+    resetPasswordForEmail: jest.fn(async (_email: string): Promise<{ data: object | null; error: unknown }> => ({ data: {}, error: null })),
+    verifyOtp: jest.fn(async (_params: { email: string; token: string; type: 'recovery' }): Promise<{ data: { session: Session | null; user: Session['user'] | null }; error: unknown }> => {
       const session = testSession();
       emit('PASSWORD_RECOVERY', session);
       return { data: { session, user: session.user }, error: null };

@@ -2,7 +2,7 @@ import type { Session, SupabaseClient } from '@supabase/supabase-js';
 import { AppState } from 'react-native';
 
 import { getSupabaseClient } from '../supabase/client';
-import { invalidRecoveryMessage, isRateLimit, passwordValidation, recoveryConfirmation, recoveryRedirectUrl, type RecoveryLink, validRecoveryEmail } from './recovery';
+import { invalidCodeMessage, invalidRecoveryMessage, isRateLimit, normalizeRecoveryCode, passwordValidation, recoveryConfirmation, validRecoveryCode, validRecoveryEmail } from './recovery';
 import { recoveryLock } from './recoveryLock';
 
 export type AuthState = {
@@ -10,7 +10,9 @@ export type AuthState = {
   session: Session | null;
   message: string | null;
   busy: 'signIn' | 'signOut' | 'requestRecovery' | 'verifyRecovery' | 'updatePassword' | 'cleanupRecovery' | null;
-  recovery?: 'verifying' | 'authorized' | 'invalid' | 'cleanup';
+  recovery?: 'requesting' | 'code' | 'verifying' | 'authorized' | 'invalid' | 'cleanup';
+  recoveryEmail?: string;
+  requestAvailableAt?: number;
 };
 
 const restoreMessage = 'We couldn’t restore your session. Check your connection and try again. Your saved session has not been intentionally removed.';
@@ -38,7 +40,6 @@ export function createAuthController(getClient: () => SupabaseClient = getSupaba
   let timer: ReturnType<typeof setTimeout> | undefined;
   let refreshWork = Promise.resolve();
   let active = AppState.currentState === 'active';
-  let pendingRecovery: RecoveryLink | undefined;
   let recoveryWork: Promise<void> | undefined;
   let sessionWork: Promise<unknown> | undefined;
   let recoveryUser: string | undefined;
@@ -119,14 +120,18 @@ export function createAuthController(getClient: () => SupabaseClient = getSupaba
     await lock.clear();
   }
 
-  function drainRecovery() {
-    if (!ready || !client || !pendingRecovery || state.busy || recoveryWork) return;
-    const link = pendingRecovery;
-    pendingRecovery = undefined;
+  async function verifyRecoveryCode(value: string) {
+    if (!ready || !client || state.busy || recoveryWork || state.recovery !== 'code' || !state.recoveryEmail) return;
+    const token = normalizeRecoveryCode(value);
+    if (!validRecoveryCode(token)) {
+      publish({ ...state, message: 'Enter the eight-digit code from your email.' });
+      return;
+    }
+    const email = state.recoveryEmail;
     const attempt = generation;
     recoveryUser = undefined;
     passwordUpdated = false;
-    publish({ status: 'recovering', session: null, recovery: 'verifying', busy: 'verifyRecovery', message: null });
+    publish({ ...state, recovery: 'verifying', busy: 'verifyRecovery', message: null });
     refresh(false);
     recoveryWork = (async () => {
       try {
@@ -134,35 +139,41 @@ export function createAuthController(getClient: () => SupabaseClient = getSupaba
         await lock.set();
         await refreshWork;
         if (attempt !== generation) return;
-        if ('invalid' in link) throw new Error('Invalid recovery link.');
         const { error: logoutError } = await client!.auth.signOut({ scope: 'local' });
         if (logoutError) throw logoutError;
         if (attempt !== generation) return;
         recoveryInterrupted = false;
-        const { data, error } = await client!.auth.verifyOtp({ token_hash: link.tokenHash, type: 'recovery' });
+        const { data, error } = await client!.auth.verifyOtp({ email, token, type: 'recovery' });
         if (attempt !== generation) return;
-        if (error || recoveryInterrupted || !data.session || !data.user || data.session.user.id !== data.user.id ||
-          !data.session.expires_at || data.session.expires_at * 1000 <= Date.now()) throw new Error('Recovery verification failed.');
+        if (recoveryInterrupted) { invalidateRecovery(); return; }
+        if (error) {
+          const code = typeof error === 'object' && 'code' in error ? error.code : null;
+          publish({ ...state, recovery: 'code', message: isRateLimit(error)
+            ? 'Too many attempts. Wait a few minutes before trying again.'
+            : code === 'otp_expired' || code === 'validation_failed' || code === 'access_denied'
+              ? invalidCodeMessage
+              : 'Unable to verify this code. Check your connection and try the latest code, or request a replacement.' });
+          return;
+        }
+        if (!data.session || !data.user?.id || data.session.user.id !== data.user.id ||
+          data.user.email?.toLowerCase() !== email || data.session.user.email?.toLowerCase() !== email ||
+          !data.session.access_token || !data.session.refresh_token || data.session.token_type !== 'bearer' ||
+          !Number.isFinite(data.session.expires_at) || data.session.expires_at! * 1000 <= Date.now()) {
+          invalidateRecovery(); return;
+        }
         recoveryUser = data.user.id;
-        recoveryDeadline = Math.min(data.session.expires_at * 1000, Date.now() + 10 * 60_000);
-        publish({ status: 'recovering', session: null, recovery: 'authorized', busy: null, message: null });
+        recoveryDeadline = Math.min(data.session.expires_at! * 1000, Date.now() + 10 * 60_000);
+        publish({ ...state, recovery: 'authorized', message: null });
       } catch {
         if (attempt === generation) {
+          // A throw can occur after the SDK persisted a session. Require cleanup, not another exchange.
           invalidateRecovery();
-          publish({ ...state, busy: null });
         }
+      } finally {
+        if (attempt === generation) publish({ ...state, busy: null });
       }
     })().finally(() => { recoveryWork = undefined; });
-  }
-
-  function receiveRecoveryLink(link: RecoveryLink) {
-    // Duplicate deliveries cannot consume another token or interrupt a password update.
-    if (state.status === 'recovering' || recoveryWork) return;
-    pendingRecovery = link;
-    sessionBlocked = true;
-    revision += 1;
-    publish({ ...state, status: 'recovering', session: null, recovery: 'verifying', message: null });
-    drainRecovery();
+    await recoveryWork;
   }
 
   async function finishRecovery() {
@@ -191,7 +202,7 @@ export function createAuthController(getClient: () => SupabaseClient = getSupaba
     const attempt = ++generation;
     ready = false;
     reading = false;
-    sessionBlocked = Boolean(pendingRecovery);
+    sessionBlocked = false;
     active = AppState.currentState === 'active';
     publish({ status: 'loading', session: null, message: null, busy: null });
     try {
@@ -204,8 +215,10 @@ export function createAuthController(getClient: () => SupabaseClient = getSupaba
         if (state.status === 'recovering') {
           // Only verifyOtp's response establishes recovery authority, never an SDK event.
           if (event === 'SIGNED_OUT' || event === 'SIGNED_IN') recoveryInterrupted = true;
+          if (state.recovery === 'verifying' && session &&
+            (event !== 'PASSWORD_RECOVERY' || session.user.email?.toLowerCase() !== state.recoveryEmail)) recoveryInterrupted = true;
           if (state.recovery === 'authorized' && (event === 'SIGNED_OUT' || event === 'SIGNED_IN' ||
-            (session && session.user.id !== recoveryUser))) invalidateRecovery();
+            (session && (session.user.id !== recoveryUser || session.user.email?.toLowerCase() !== state.recoveryEmail)))) invalidateRecovery();
           return;
         }
         if (event === 'PASSWORD_RECOVERY') return;
@@ -255,19 +268,13 @@ export function createAuthController(getClient: () => SupabaseClient = getSupaba
         } catch {
           if (attempt === generation) {
             publish({ ...state, busy: null, message: 'An interrupted reset needs session cleanup. Reconnect and retry cleanup.' });
-            pendingRecovery = undefined;
           }
           return;
         } finally {
           recoveryWork = undefined;
         }
         if (attempt !== generation) return;
-        publish({ status: 'signedOut', session: null, busy: null, message: 'Your reset was interrupted. Request a new link to continue.' });
-      }
-      if (pendingRecovery) {
-        publish({ status: 'recovering', session: null, recovery: 'verifying', busy: null, message: null });
-        drainRecovery();
-        return;
+        publish({ status: 'signedOut', session: null, busy: null, message: 'Your reset was interrupted. Request a new code to continue.' });
       }
       await restore();
       if (attempt === generation) refresh(active && state.status !== 'recovering');
@@ -290,7 +297,7 @@ export function createAuthController(getClient: () => SupabaseClient = getSupaba
   }
 
   return {
-    receiveRecoveryLink,
+    verifyRecoveryCode,
     finishRecovery,
     getSnapshot: () => state,
     subscribe(listener: () => void) {
@@ -309,25 +316,52 @@ export function createAuthController(getClient: () => SupabaseClient = getSupaba
       }
     },
     async requestRecovery(email: string): Promise<string | null> {
-      if (!client || !ready || state.busy || state.status !== 'signedOut') return null;
+      if (!client || !ready || state.busy || recoveryWork ||
+        (state.status !== 'signedOut' && state.status !== 'signedIn' && state.recovery !== 'code')) return null;
       if (!validRecoveryEmail(email)) return 'Enter a valid email address.';
-      if (Date.now() < requestAfter) return 'Please wait a minute before requesting another reset email.';
+      // Resends cannot change the identity bound to this flow.
+      const address = email.trim().toLowerCase();
+      if (state.recovery === 'code' && address !== state.recoveryEmail) return null;
+      if (Date.now() < requestAfter) return 'Please wait a minute before requesting another recovery code.';
       requestAfter = Date.now() + 60_000;
       const attempt = generation;
-      publish({ ...state, busy: 'requestRecovery', message: null });
-      try {
-        const { error } = await client.auth.resetPasswordForEmail(email.trim(), { redirectTo: recoveryRedirectUrl });
-        if (error) throw error;
-        return recoveryConfirmation;
-      } catch (error) {
-        if (isRateLimit(error)) return 'Too many requests. Wait a few minutes before trying again.';
-        // Account-specific responses receive exactly the same confirmation as a successful request.
-        const code = typeof error === 'object' && error && 'code' in error ? error.code : null;
-        if (code === 'user_not_found' || code === 'email_not_confirmed' || code === 'user_banned') return recoveryConfirmation;
-        return 'Unable to request a reset email. Check your connection and try again later.';
-      } finally {
-        if (attempt === generation) { publish({ ...state, busy: null }); drainRecovery(); }
-      }
+      sessionBlocked = true;
+      revision += 1;
+      recoveryUser = undefined;
+      passwordUpdated = false;
+      publish({ status: 'recovering', session: null, recovery: 'requesting', recoveryEmail: address,
+        requestAvailableAt: requestAfter, busy: 'requestRecovery', message: null });
+      refresh(false);
+      let result: string | null = null;
+      recoveryWork = (async () => {
+        try {
+          await lock.set();
+          await refreshWork;
+          if (attempt !== generation) return;
+          const { error: logoutError } = await client!.auth.signOut({ scope: 'local' });
+          if (logoutError) throw logoutError;
+          if (attempt !== generation) return;
+          try {
+            const { error } = await client!.auth.resetPasswordForEmail(address);
+            if (error) throw error;
+            result = recoveryConfirmation;
+          } catch (error) {
+            const code = typeof error === 'object' && error && 'code' in error ? error.code : null;
+            result = isRateLimit(error) ? 'Too many requests. Wait a few minutes before trying again.'
+              : code === 'user_not_found' || code === 'email_not_confirmed' || code === 'user_banned'
+                ? recoveryConfirmation : 'Unable to request a recovery code. Check your connection and try again later.';
+          }
+          if (attempt === generation) publish({ ...state, recovery: 'code', message: result });
+        } catch {
+          if (attempt === generation) {
+            publish({ ...state, recovery: 'cleanup', message: 'Unable to prepare secure recovery. Retry session cleanup before starting again.' });
+          }
+        } finally {
+          if (attempt === generation) publish({ ...state, busy: null });
+        }
+      })().finally(() => { recoveryWork = undefined; });
+      await recoveryWork;
+      return attempt === generation ? result : null;
     },
     async updateRecoveryPassword(password: string, confirmation: string) {
       if (!client || !ready || state.busy || state.recovery !== 'authorized' || !recoveryUser) return;
@@ -342,19 +376,23 @@ export function createAuthController(getClient: () => SupabaseClient = getSupaba
           // Revalidate the SDK's CURRENT user before modifying it. No session-switching API runs concurrently.
           const { data, error } = await client!.auth.getUser();
           if (attempt !== generation) return;
-          if (error || data.user?.id !== user || recoveryUser !== user || Date.now() >= recoveryDeadline) {
+          if (error || data.user?.id !== user || data.user.email?.toLowerCase() !== state.recoveryEmail ||
+            recoveryUser !== user || Date.now() >= recoveryDeadline) {
             invalidateRecovery(); return;
           }
           const result = await client!.auth.updateUser({ password });
           if (attempt !== generation) return;
           if (result.error) throw result.error;
+          if (result.data.user?.id !== user || result.data.user.email?.toLowerCase() !== state.recoveryEmail || recoveryUser !== user) {
+            invalidateRecovery(); throw new Error('Password update unconfirmed.');
+          }
           passwordUpdated = true;
           recoveryUser = undefined;
           publish({ ...state, recovery: 'cleanup', message: null });
         } catch (error) {
           if (attempt === generation) publish({ ...state, message: isRateLimit(error)
             ? 'Too many attempts. Wait a few minutes and try again.'
-            : 'Unable to confirm the password update. Use a different strong password and check your connection, or request a new link.' });
+            : 'Unable to confirm the password update. Use a different strong password and check your connection, or return to sign-in and request a new code.' });
         } finally {
           if (attempt === generation) publish({ ...state, busy: null });
         }
@@ -381,7 +419,7 @@ export function createAuthController(getClient: () => SupabaseClient = getSupaba
         }
       } finally {
         sessionWork = undefined;
-        if (attempt === generation) { publish({ ...state, busy: null }); drainRecovery(); }
+        if (attempt === generation) publish({ ...state, busy: null });
       }
     },
     async signOut() {
@@ -404,7 +442,7 @@ export function createAuthController(getClient: () => SupabaseClient = getSupaba
         if (attempt === generation) publish({ ...state, message: signOutMessage });
       } finally {
         sessionWork = undefined;
-        if (attempt === generation) { publish({ ...state, busy: null }); drainRecovery(); }
+        if (attempt === generation) publish({ ...state, busy: null });
       }
     },
   };

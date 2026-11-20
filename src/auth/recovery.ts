@@ -1,23 +1,16 @@
-import 'react-native-url-polyfill/auto';
+// Matches the Development project's owner-verified Email OTP length (8).
+export const recoveryCodeLength = 8;
+export const recoveryConfirmation = 'If an account can receive a recovery email, a code will arrive shortly. Check your inbox and spam folder.';
+export const invalidRecoveryMessage = 'This recovery session is no longer valid. Return to sign-in and request a new code.';
+export const invalidCodeMessage = 'This code is invalid, expired, or already used. Enter the latest code or request a replacement.';
 
-export const recoveryRedirectUrl = 'kuttberg-hq://reset-password';
-export const recoveryConfirmation = 'If an account can receive a reset email, a link will arrive shortly. Check your inbox and spam folder.';
-export const invalidRecoveryMessage = 'This reset link is invalid, expired, or already used. Return to sign-in and request a new link.';
-export type RecoveryLink = { tokenHash: string } | { invalid: true };
+/** Preserve leading zeros; never truncate a pasted value into a different valid code. */
+export function normalizeRecoveryCode(value: string) {
+  return value.trim();
+}
 
-/** Only this exact native destination can carry credentials. Never trust a URL's type label alone. */
-export function parseRecoveryLink(path: string): RecoveryLink | null {
-  try {
-    const url = new URL(path);
-    if (url.protocol !== 'kuttberg-hq:' || url.host !== 'reset-password' || url.pathname !== '' || url.username || url.password) return null;
-    const params = url.searchParams;
-    if (url.hash || params.getAll('type').length !== 1 || params.get('type') !== 'recovery' ||
-      params.getAll('token_hash').length !== 1 || [...params.keys()].some((key) => key !== 'type' && key !== 'token_hash')) return { invalid: true };
-    const tokenHash = params.get('token_hash')!;
-    return /^[a-zA-Z0-9_-]{32,256}$/.test(tokenHash) ? { tokenHash } : { invalid: true };
-  } catch {
-    return null;
-  }
+export function validRecoveryCode(value: string) {
+  return value.length === recoveryCodeLength && /^[0-9]+$/.test(value);
 }
 
 export function validRecoveryEmail(email: string) {

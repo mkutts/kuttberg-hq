@@ -3,6 +3,7 @@ import { type ComponentRef, useEffect, useRef, useState } from 'react';
 import { AppState, Keyboard, TextInput, View } from 'react-native';
 
 import { useAuth } from '../src/auth/AuthProvider';
+import { RecoveryCodeForm } from '../src/auth/RecoveryCodeForm';
 import { invalidRecoveryMessage, passwordValidation } from '../src/auth/recovery';
 import { RecoveryForm, RecoveryMessage, recoveryStyles } from '../src/auth/RecoveryForm';
 import { AppButton } from '../src/components/ui/AppButton';
@@ -37,7 +38,8 @@ export default function ResetPasswordScreen() {
     if (status === 'recovering') await finishRecovery();
     else router.replace('/sign-in');
   }
-  return <RecoveryForm title={authorized ? 'Choose a new password' : recovery === 'verifying' ? 'Checking your reset link' : 'Password recovery'}>
+  return <RecoveryForm title={authorized ? 'Choose a new password' : recovery === 'code' ? 'Check your email' : 'Password recovery'}>
+    {recovery === 'code' && <RecoveryCodeForm />}
     {authorized && <>
       <AppText variant="secondaryBody">Use a unique password with 12 to 128 characters. A long passphrase works well.</AppText>
       <View style={recoveryStyles.field}>
@@ -57,7 +59,8 @@ export default function ResetPasswordScreen() {
     <RecoveryMessage message={validation || message || (!recovery ? invalidRecoveryMessage : null)} />
     {authorized && <AppButton label={busy === 'updatePassword' ? 'Updating password…' : 'Update password'}
       loading={busy === 'updatePassword'} disabled={Boolean(busy)} onPress={() => void submit()} />}
-    {recovery === 'verifying' && <AppText accessibilityLiveRegion="polite">Verifying your one-time reset link securely…</AppText>}
+    {recovery === 'requesting' && <AppText accessibilityLiveRegion="polite">Sending recovery code.</AppText>}
+    {recovery === 'verifying' && <AppText accessibilityLiveRegion="polite">Verifying your recovery code securely.</AppText>}
     {recovery === 'cleanup' && <AppText variant="secondaryBody">Finish clearing this reset session before signing in.</AppText>}
     <AppButton label={recovery === 'cleanup' ? 'Retry session cleanup' : 'Back to sign-in'} variant="secondary"
       loading={busy === 'cleanupRecovery'} disabled={Boolean(busy)} onPress={() => void leave()} />
