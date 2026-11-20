@@ -131,6 +131,7 @@ export function AppUpdatesSection() {
       <AppText variant="caption">
         Some changes, including app icons and native features, require installing a new app version.
       </AppText>
+      <AppText variant="caption">OTA Test — November 2026 — Task 05</AppText>
       <AppButton
         label={showDetails ? 'Hide Update Details' : 'Show Update Details'}
         variant="secondary"
