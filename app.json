@@ -8,7 +8,8 @@
     },
     "updates": {
       "url": "https://u.expo.dev/32c14ce4-a3e8-4dcd-af19-49cdc676b3bb",
-      "checkAutomatically": "NEVER"
+      "checkAutomatically": "ON_LOAD",
+      "fallbackToCacheTimeout": 0
     },
     "platforms": [
       "ios",
