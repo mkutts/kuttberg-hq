@@ -54,7 +54,8 @@
       "icon": "./assets/images/KuttbergHQ_iOS_App_Icon_1024.png",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "buildNumber": "2"
     },
     "android": {
       "package": "com.mkutts.kuttberghq",
@@ -62,7 +63,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/KuttbergHQ_Android_Adaptive_Foreground_1024.png",
         "backgroundImage": "./assets/images/KuttbergHQ_Android_Adaptive_Background_1024.png"
-      }
+      },
+      "versionCode": 2
     },
     "extra": {
       "router": {
