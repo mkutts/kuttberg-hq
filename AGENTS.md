@@ -31,3 +31,7 @@ JavaScript exports for relevant changes. Report automated results and device
 verification separately for each platform.
 
 Stop after each task for user review. Begin each subsequent task only after explicit approval.
+
+## Milestone 04 - Tasks database
+
+Task 01 adds `public.tasks` and read-only `public.task_events` through an additive migration. Inbox is `tasks.is_inbox` within an existing workspace; the user's existing private Personal workspace supplies a private default. Existing workspace owner/member RLS controls task and history visibility. Every status change is recorded by a database trigger in the same transaction; direct client history writes and hard deletion are denied. Archive is a nullable timestamp and archived rows remain queryable by authorized users. See [Task 01 database notes](docs/milestone-04-task-01.md) for migration, local test commands, and verification limits. Do not deploy this migration to hosted Supabase without explicit approval.
