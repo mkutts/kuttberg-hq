@@ -2,6 +2,8 @@ import { fireEvent, renderRouter, screen, testRouter } from 'expo-router/testing
 
 import config from '../app.json';
 
+jest.mock('../src/auth/AuthProvider', () => jest.requireActual('../test-support/signedInAuth'));
+
 test('opens Settings from Today and returns using the visible back control', async () => {
   await renderRouter('app');
   await fireEvent.press(screen.getByRole('button', { name: 'Settings' }));
@@ -44,5 +46,6 @@ test('shows app information, the App Updates section, and informational future p
   }
   expect(screen.getAllByText('Coming later')).toHaveLength(3);
   expect(screen.queryByRole('switch')).toBeNull();
-  expect(screen.getByText(/private accounts and household data synchronization are planned/i)).toBeOnTheScreen();
+  expect(screen.getByText(/your session is stored securely on this device/i)).toBeOnTheScreen();
+  expect(screen.getByRole('button', { name: 'Sign out' })).toBeOnTheScreen();
 });

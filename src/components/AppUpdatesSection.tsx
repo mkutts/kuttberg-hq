@@ -51,7 +51,7 @@ function updateControls(state: ReturnType<typeof useAppUpdates>['state']): Updat
       };
     case 'ready':
       return {
-        status: rollback ? 'Rollback ready. Restart to load the built-in version.' : 'Update downloaded. Restart to apply it.',
+        status: rollback ? 'Rollback ready. Close and reopen to load the built-in version, or restart now.' : 'Update downloaded. Close and reopen the app, or restart now.',
         button: { label: restartLabel, action: 'restart' },
       };
     case 'restarting':
@@ -123,9 +123,15 @@ export function AppUpdatesSection() {
           onPress={() => { void updates[button.action](); }}
         />
       )}
+      {kind !== 'unsupported' && updates.automatic && (
+        <AppText variant="caption">
+          Compatible updates download automatically when you open the app. A downloaded update loads the next time you fully close and reopen it.
+        </AppText>
+      )}
       <AppText variant="caption">
         Some changes, including app icons and native features, require installing a new app version.
       </AppText>
+      <AppText variant="caption">OTA Test — November 2026 — Task 05</AppText>
       <AppButton
         label={showDetails ? 'Hide Update Details' : 'Show Update Details'}
         variant="secondary"
