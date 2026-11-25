@@ -43,6 +43,7 @@ function AuthenticatedNavigation() {
       <Stack.Protected guard={status === 'signedIn'}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="settings" />
+        <Stack.Screen name="quick-capture" options={{ presentation: 'modal' }} />
       </Stack.Protected>
       <Stack.Protected guard={status === 'signedOut'}>
         <Stack.Screen name="sign-in" />
